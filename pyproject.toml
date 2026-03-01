@@ -6,10 +6,17 @@ requires = ["setuptools", "setuptools-scm>=8.1.0"]
 name = "wiremock-mock"
 description = "Serve WireMock stubs as a mock with respx."
 readme = {file = "README.rst", content-type = "text/x-rst"}
-keywords = ["httpx", "mock", "respx", "wiremock"]
+keywords = [
+    "httpx",
+    "mock",
+    "respx",
+    "wiremock",
+]
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{name = "Adam Dangoor", email = "adamdangoor@gmail.com"}]
+authors = [
+    { name = "Adam Dangoor", email = "adamdangoor@gmail.com" },
+]
 requires-python = ">=3.12"
 classifiers = [
     "Development Status :: 4 - Beta",
