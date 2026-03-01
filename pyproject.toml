@@ -168,7 +168,8 @@ terminal.error-on-warning = true
 [tool.pydocstringformatter]
 write = true
 split-summary-body = false
-max-line-length = 88
+max-line-length = 75
+linewrap-full-docstring = true
 
 [tool.interrogate]
 fail-under = 100
