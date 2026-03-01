@@ -1,9 +1,11 @@
 """Pytest configuration with Sybil for doc testing."""
 
+from doctest import ELLIPSIS
+
 import pytest
 from beartype import beartype
 from sybil import Sybil
-from sybil.parsers.codeblock import PythonCodeBlockParser
+from sybil.parsers.rest import DocTestParser, PythonCodeBlockParser
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -13,7 +15,12 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
             item.obj = beartype(obj=item.obj)
 
 
-pytest_collect_file = Sybil(
-    parsers=[PythonCodeBlockParser()],
-    pattern="*.rst",
-).pytest()
+sybil = Sybil(
+    parsers=[
+        DocTestParser(optionflags=ELLIPSIS),
+        PythonCodeBlockParser(),
+    ],
+    patterns=["*.rst", "*.py"],
+)
+
+pytest_collect_file = sybil.pytest()
