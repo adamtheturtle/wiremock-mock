@@ -164,8 +164,9 @@ report.show_missing = true
 [tool.mypy]
 strict = true
 files = ["."]
-exclude = ["build", ".venv"]
+exclude = ["build"]
 plugins = ["mypy_strict_kwargs"]
+follow_untyped_imports = true
 
 [tool.pyrefly]
 errors.non-exhaustive-match = "error"
