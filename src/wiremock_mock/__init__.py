@@ -1,31 +1,11 @@
 """Package for serving WireMock stubs as a mock with respx."""
 
-import json
 import re
-from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import httpx
 import respx
 from beartype import beartype
-
-
-@beartype
-def load_stubs(path: str | Path) -> dict[str, Any]:
-    """
-    Load WireMock stubs from a JSON file.
-
-    Supports the WireMock Admin API import format with a ``mappings`` array.
-
-    :param path: Path to the stubs file (``.json``).
-    :return: Stubs as a dict with ``mappings`` key.
-    """
-    path = Path(path)
-    text = path.read_text()
-    result: Any = json.loads(s=text)
-    if not isinstance(result, dict):
-        raise ValueError("Stubs file must contain a JSON object")
-    return cast(dict[str, Any], result)
 
 
 def _build_path_pattern(
@@ -76,8 +56,8 @@ def add_wiremock_to_respx(
     Response uses status, headers, and jsonBody from each stub.
 
     :param mock_obj: The respx MockRouter or Router to add routes to.
-    :param stubs: WireMock stubs dict (from ``load_stubs`` or JSON with
-        ``mappings`` array).
+    :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
+        ``json.loads(path.read_text())``).
     :param base_url: Base URL for all routes. Must match ``respx.mock()``.
     """
     mappings = stubs.get("mappings") or []
@@ -147,4 +127,4 @@ def add_wiremock_to_respx(
         mock_obj.route(method=method, url=url_pattern).mock(return_value=response)
 
 
-__all__ = ["add_wiremock_to_respx", "load_stubs"]
+__all__ = ["add_wiremock_to_respx"]

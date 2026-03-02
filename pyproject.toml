@@ -222,7 +222,6 @@ ignore_path = [
 [tool.vulture]
 ignore_names = [
     "add_wiremock_to_respx",
-    "load_stubs",
     "base_url",
     "request",
 ]
