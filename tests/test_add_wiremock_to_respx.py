@@ -12,7 +12,7 @@ BASE_URL = "http://notion-mock.test"
 
 
 def test_add_wiremock_to_respx_simple_get() -> None:
-    """add_wiremock_to_respx adds a simple GET stub."""
+    """Add_wiremock_to_respx adds a simple GET stub."""
     stubs = {
         "mappings": [
             {
@@ -33,7 +33,7 @@ def test_add_wiremock_to_respx_simple_get() -> None:
 
 
 def test_add_wiremock_to_respx_post() -> None:
-    """add_wiremock_to_respx adds a POST stub."""
+    """Add_wiremock_to_respx adds a POST stub."""
     stubs = {
         "mappings": [
             {
@@ -53,7 +53,7 @@ def test_add_wiremock_to_respx_post() -> None:
 
 
 def test_add_wiremock_to_respx_patch() -> None:
-    """add_wiremock_to_respx adds a PATCH stub."""
+    """Add_wiremock_to_respx adds a PATCH stub."""
     stubs = {
         "mappings": [
             {
@@ -78,7 +78,7 @@ def test_add_wiremock_to_respx_patch() -> None:
 
 
 def test_add_wiremock_to_respx_delete() -> None:
-    """add_wiremock_to_respx adds a DELETE stub."""
+    """Add_wiremock_to_respx adds a DELETE stub."""
     stubs = {
         "mappings": [
             {
@@ -94,7 +94,7 @@ def test_add_wiremock_to_respx_delete() -> None:
 
 
 def test_add_wiremock_to_respx_with_query_parameters() -> None:
-    """add_wiremock_to_respx matches query parameters with equalTo."""
+    """Add_wiremock_to_respx matches query parameters with equalTo."""
     stubs = {
         "mappings": [
             {
@@ -122,7 +122,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
 
 
 def test_add_wiremock_to_respx_url_path_pattern() -> None:
-    """add_wiremock_to_respx supports urlPathPattern regex."""
+    """Add_wiremock_to_respx supports urlPathPattern regex."""
     stubs = {
         "mappings": [
             {
@@ -144,21 +144,21 @@ def test_add_wiremock_to_respx_url_path_pattern() -> None:
 
 
 def test_add_wiremock_to_respx_empty_mappings() -> None:
-    """add_wiremock_to_respx handles empty mappings without error."""
+    """Add_wiremock_to_respx handles empty mappings without error."""
     stubs: dict[str, Any] = {"mappings": []}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
 
 def test_add_wiremock_to_respx_mappings_not_list() -> None:
-    """add_wiremock_to_respx returns early when mappings is not a list."""
+    """Add_wiremock_to_respx returns early when mappings is not a list."""
     stubs = {"mappings": "not-a-list"}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
 
 def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
-    """add_wiremock_to_respx supports urlPathPattern without urlPath."""
+    """Add_wiremock_to_respx supports urlPathPattern without urlPath."""
     stubs = {
         "mappings": [
             {
@@ -174,7 +174,7 @@ def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
 
 
 def test_add_wiremock_to_respx_body_response() -> None:
-    """add_wiremock_to_respx supports body (non-JSON) response."""
+    """Add_wiremock_to_respx supports body (non-JSON) response."""
     stubs = {
         "mappings": [
             {
@@ -191,7 +191,7 @@ def test_add_wiremock_to_respx_body_response() -> None:
 
 
 def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
-    """add_wiremock_to_respx adds leading slash when urlPath lacks it."""
+    """Add_wiremock_to_respx adds leading slash when urlPath lacks it."""
     stubs = {
         "mappings": [
             {
@@ -207,7 +207,7 @@ def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
 
 
 def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
-    """add_wiremock_to_respx skips mappings with invalid structure."""
+    """Add_wiremock_to_respx skips mappings with invalid structure."""
     stubs = {
         "mappings": [
             "not-a-dict",
@@ -229,7 +229,7 @@ def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
 
 
 def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
-    """add_wiremock_to_respx ignores query params without equalTo."""
+    """Add_wiremock_to_respx ignores query params without equalTo."""
     stubs = {
         "mappings": [
             {
@@ -249,7 +249,9 @@ def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
 
 
 def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
-    """add_wiremock_to_respx uses defaults for invalid status and headers."""
+    """Add_wiremock_to_respx uses defaults for invalid status and
+    headers.
+    """
     stubs = {
         "mappings": [
             {
