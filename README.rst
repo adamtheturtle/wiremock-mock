@@ -1,9 +1,14 @@
+|Build Status| |PyPI|
+
 wiremock-mock
 =============
 
 Serve WireMock stubs as a mock with `respx`_.
 
-.. _respx: https://lundberg.github.io/respx/
+Requires Python |minimum-python-version|\+.
+
+.. contents::
+   :local:
 
 Installation
 ------------
@@ -49,8 +54,16 @@ the ``httpx`` level via respx. To load stubs from a JSON file, use
 ``json.loads(path.read_text())``.
 
 Supported stub features
-----------------------
+-----------------------
 
 - **Request matching**: ``method``, ``urlPath`` (exact), ``urlPathPattern`` (regex)
 - **Query parameters**: ``queryParameters`` with ``equalTo``
 - **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
+
+.. _respx: https://lundberg.github.io/respx/
+
+.. |Build Status| image:: https://github.com/adamtheturtle/wiremock-mock/actions/workflows/ci.yml/badge.svg?branch=main
+   :target: https://github.com/adamtheturtle/wiremock-mock/actions
+.. |PyPI| image:: https://badge.fury.io/py/wiremock-mock.svg
+   :target: https://badge.fury.io/py/wiremock-mock
+.. |minimum-python-version| replace:: 3.12
