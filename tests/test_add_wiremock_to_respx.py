@@ -285,6 +285,31 @@ def test_add_wiremock_to_respx_query_param_non_dict_matcher() -> None:
         assert response.status_code == HTTPStatus.OK
 
 
+def test_add_wiremock_to_respx_url_path_with_extra_query_params() -> None:
+    """UrlPath without queryParameters matches requests with query
+    params.
+    """
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {
+                    "method": "GET",
+                    "urlPath": "/v1/blocks/test/children",
+                },
+                "response": {"status": 200, "jsonBody": {"ok": True}},
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        response = httpx.get(
+            url=f"{BASE_URL}/v1/blocks/test/children",
+            params={"page_size": 100},
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {"ok": True}
+
+
 def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     """Add_wiremock_to_respx uses defaults for invalid status and
     headers.
