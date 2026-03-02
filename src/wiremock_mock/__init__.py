@@ -15,6 +15,7 @@ def _build_path_pattern(
     path_pattern: str | None,
     query_params: dict[str, Any] | None,
 ) -> re.Pattern[str]:
+    """Build a URL pattern for matching requests."""
     base = base_url.rstrip("/")
     path_part = path if path.startswith("/") else f"/{path}"
 
