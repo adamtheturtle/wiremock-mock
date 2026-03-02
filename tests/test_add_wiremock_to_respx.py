@@ -263,6 +263,26 @@ def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
         assert response.status_code == HTTPStatus.OK
 
 
+def test_add_wiremock_to_respx_query_param_non_dict_matcher() -> None:
+    """Add_wiremock_to_respx skips query params with non-dict matchers."""
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {
+                    "method": "GET",
+                    "urlPath": "/v1/comments",
+                    "queryParameters": {"block_id": "not-a-dict"},
+                },
+                "response": {"status": 200, "jsonBody": {}},
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        response = httpx.get(url=f"{BASE_URL}/v1/comments")
+        assert response.status_code == HTTPStatus.OK
+
+
 def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     """Add_wiremock_to_respx uses defaults for invalid status and
     headers.
