@@ -264,7 +264,9 @@ def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
 
 
 def test_add_wiremock_to_respx_query_param_non_dict_matcher() -> None:
-    """Add_wiremock_to_respx skips query params with non-dict matcher values."""
+    """Add_wiremock_to_respx skips query params with non-dict matcher
+    values.
+    """
     stubs: dict[str, Any] = {
         "mappings": [
             {
