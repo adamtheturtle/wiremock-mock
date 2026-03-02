@@ -1,6 +1,7 @@
 """Tests for add_wiremock_to_respx."""
 
 from http import HTTPStatus
+from typing import Any
 
 import httpx
 import respx
@@ -26,7 +27,7 @@ def test_add_wiremock_to_respx_simple_get() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/pages")
+        response = httpx.get(url=f"{BASE_URL}/v1/pages")
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {"object": "list", "results": []}
 
@@ -46,7 +47,7 @@ def test_add_wiremock_to_respx_post() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.post(f"{BASE_URL}/v1/pages", json={"parent": {}})
+        response = httpx.post(url=f"{BASE_URL}/v1/pages", json={"parent": {}})
         assert response.status_code == HTTPStatus.OK
         assert response.json()["id"] == "abc-123"
 
@@ -70,7 +71,7 @@ def test_add_wiremock_to_respx_patch() -> None:
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
         response = httpx.patch(
-            f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5",
+            url=f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5",
             json={"properties": {}},
         )
         assert response.status_code == HTTPStatus.OK
@@ -88,7 +89,7 @@ def test_add_wiremock_to_respx_delete() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.delete(f"{BASE_URL}/v1/blocks/block-123")
+        response = httpx.delete(url=f"{BASE_URL}/v1/blocks/block-123")
         assert response.status_code == HTTPStatus.OK
 
 
@@ -114,7 +115,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
         response = httpx.get(
-            f"{BASE_URL}/v1/comments",
+            url=f"{BASE_URL}/v1/comments",
             params={"block_id": "cccc0000-0000-0000-0000-000000000010"},
         )
         assert response.status_code == HTTPStatus.OK
@@ -138,13 +139,13 @@ def test_add_wiremock_to_respx_url_path_pattern() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5")
+        response = httpx.get(url=f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5")
         assert response.status_code == HTTPStatus.OK
 
 
 def test_add_wiremock_to_respx_empty_mappings() -> None:
     """add_wiremock_to_respx handles empty mappings without error."""
-    stubs = {"mappings": []}
+    stubs: dict[str, Any] = {"mappings": []}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
@@ -168,7 +169,7 @@ def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/blocks/abc-123")
+        response = httpx.get(url=f"{BASE_URL}/v1/blocks/abc-123")
         assert response.status_code == HTTPStatus.OK
 
 
@@ -184,7 +185,7 @@ def test_add_wiremock_to_respx_body_response() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/raw")
+        response = httpx.get(url=f"{BASE_URL}/v1/raw")
         assert response.status_code == HTTPStatus.OK
         assert response.text == "plain text"
 
@@ -201,7 +202,7 @@ def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/pages")
+        response = httpx.get(url=f"{BASE_URL}/v1/pages")
         assert response.status_code == HTTPStatus.OK
 
 
@@ -222,7 +223,7 @@ def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/valid")
+        response = httpx.get(url=f"{BASE_URL}/valid")
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {"ok": True}
 
@@ -243,7 +244,7 @@ def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/comments")
+        response = httpx.get(url=f"{BASE_URL}/v1/comments")
         assert response.status_code == HTTPStatus.OK
 
 
@@ -263,6 +264,6 @@ def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(f"{BASE_URL}/v1/edge")
+        response = httpx.get(url=f"{BASE_URL}/v1/edge")
         assert response.status_code == 200
         assert response.json() == {"ok": True}

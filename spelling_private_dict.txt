@@ -1,3 +1,7 @@
-wiremock
-respx
+beartype
 httpx
+JSON
+params
+Pytest
+respx
+wiremock
