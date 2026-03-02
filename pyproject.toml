@@ -107,6 +107,10 @@ lint.ignore = [
     # Ruff warns that this conflicts with the formatter.
     "ISC001",
 ]
+lint.per-file-ignores."doccmd_README_rst_*.py" = [
+    # Allow 'assert' in documentation code examples.
+    "S101",
+]
 lint.per-file-ignores."docs/source/doccmd_*.py" = [
     # Allow 'assert' in documentation code examples.
     "S101",
@@ -323,17 +327,6 @@ ignore_names = [
     "add_wiremock_to_respx",
     "base_url",
     "request",
-    # Internal TypedDict classes used via cast() string literals
-    "_Mapping",
-    "_QueryParamMatcher",
-    "_RequestSpec",
-    "_ResponseSpec",
-    # TypedDict fields accessed via string keys (not attribute access)
-    "equalTo",
-    "jsonBody",
-    "queryParameters",
-    "urlPath",
-    "urlPathPattern",
     # pytest configuration
     "pytest_collect_file",
     "pytest_collection_modifyitems",
