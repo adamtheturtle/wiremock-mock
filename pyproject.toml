@@ -111,6 +111,10 @@ lint.per-file-ignores."tests/test_*.py" = [
     # Allow 'assert' as we use it for tests.
     "S101",
 ]
+lint.per-file-ignores."docs/source/doccmd_*.py" = [
+    # Allow 'assert' in documentation code examples.
+    "S101",
+]
 # Do not automatically remove commented out code.
 # We comment out code during development, and with VSCode auto-save, this code
 # is sometimes annoyingly removed.
