@@ -300,6 +300,13 @@ typeCheckingMode = "strict"
 analysis.respect-type-ignore-comments = false
 terminal.error-on-warning = true
 
+[tool.mypy_strict_kwargs]
+ignore_names = [
+    "wiremock_mock._is_list",
+    "wiremock_mock._is_str_dict",
+    "wiremock_mock._is_str_str_dict",
+]
+
 [tool.pydocstringformatter]
 write = true
 split-summary-body = false
