@@ -15,7 +15,7 @@ _PAGE_ID = "59833787-2cf9-4fdf-8782-e53db20768a5"
 
 def test_add_wiremock_to_respx_simple_get() -> None:
     """Add_wiremock_to_respx adds a simple GET stub."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/pages"},
@@ -36,7 +36,7 @@ def test_add_wiremock_to_respx_simple_get() -> None:
 
 def test_add_wiremock_to_respx_post() -> None:
     """Add_wiremock_to_respx adds a POST stub."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {"method": "POST", "urlPath": "/v1/pages"},
@@ -56,7 +56,7 @@ def test_add_wiremock_to_respx_post() -> None:
 
 def test_add_wiremock_to_respx_patch() -> None:
     """Add_wiremock_to_respx adds a PATCH stub."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -81,7 +81,7 @@ def test_add_wiremock_to_respx_patch() -> None:
 
 def test_add_wiremock_to_respx_delete() -> None:
     """Add_wiremock_to_respx adds a DELETE stub."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -101,7 +101,7 @@ def test_add_wiremock_to_respx_delete() -> None:
 def test_add_wiremock_to_respx_with_query_parameters() -> None:
     """Add_wiremock_to_respx matches query parameters with equalTo."""
     _block_id = "cccc0000-0000-0000-0000-000000000010"
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -129,7 +129,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
 
 def test_add_wiremock_to_respx_url_path_pattern() -> None:
     """Add_wiremock_to_respx supports urlPathPattern regex."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -158,14 +158,14 @@ def test_add_wiremock_to_respx_empty_mappings() -> None:
 
 def test_add_wiremock_to_respx_mappings_not_list() -> None:
     """Add_wiremock_to_respx returns early when mappings is not a list."""
-    stubs = {"mappings": "not-a-list"}
+    stubs: dict[str, Any] = {"mappings": "not-a-list"}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
 
 def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
     """Add_wiremock_to_respx supports urlPathPattern without urlPath."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -184,7 +184,7 @@ def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
 
 def test_add_wiremock_to_respx_body_response() -> None:
     """Add_wiremock_to_respx supports body (non-JSON) response."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/raw"},
@@ -201,7 +201,7 @@ def test_add_wiremock_to_respx_body_response() -> None:
 
 def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
     """Add_wiremock_to_respx adds leading slash when urlPath lacks it."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "v1/pages"},
@@ -217,7 +217,7 @@ def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
 
 def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
     """Add_wiremock_to_respx skips mappings with invalid structure."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             "not-a-dict",
             {"request": "invalid", "response": {"status": 200}},
@@ -245,7 +245,7 @@ def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
 
 def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
     """Add_wiremock_to_respx ignores query params without equalTo."""
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {
@@ -267,7 +267,7 @@ def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     """Add_wiremock_to_respx uses defaults for invalid status and
     headers.
     """
-    stubs = {
+    stubs: dict[str, Any] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/edge"},
