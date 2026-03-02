@@ -17,6 +17,7 @@ ci:
     - mypy
     - mypy-docs
     - pylint
+    - pylint-docs
     - pyproject-fmt-fix
     - pyright
     - pyright-docs
@@ -249,7 +250,6 @@ repos:
           --command="vulture"
         language: python
         types_or: [markdown, rst]
-        pass_filenames: false
         additional_dependencies: [uv==0.9.5]
         stages: [pre-commit]
 
