@@ -13,7 +13,7 @@ def _build_path_pattern(
     base_url: str,
     path: str,
     path_pattern: str | None,
-    query_params: dict[str, object] | None,
+    query_params: dict[str, Any] | None,
 ) -> re.Pattern[str]:
     """Build a URL pattern for matching requests."""
     base = base_url.rstrip("/")
@@ -66,12 +66,11 @@ def add_wiremock_to_respx(
         ``json.loads(path.read_text())``).
     :param base_url: Base URL for all routes. Must match ``respx.mock()``.
     """
-    raw: object = stubs.get("mappings") or []
+    raw = stubs.get("mappings") or []
     if not isinstance(raw, list):
         return
-    mappings = raw
 
-    for item in mappings:
+    for item in raw:
         if not isinstance(item, dict):
             continue
 
@@ -82,7 +81,7 @@ def add_wiremock_to_respx(
         ):
             continue
 
-        method_raw: object = request_raw.get("method") or "GET"
+        method_raw = request_raw.get("method") or "GET"
         if not isinstance(method_raw, str):
             continue
         method = method_raw.upper()
@@ -90,7 +89,7 @@ def add_wiremock_to_respx(
         url_path = request_raw.get("urlPath")
         url_path_pattern = request_raw.get("urlPathPattern")
         query_params_raw = request_raw.get("queryParameters")
-        query_params: dict[str, object] | None = (
+        query_params: dict[str, Any] | None = (
             query_params_raw if isinstance(query_params_raw, dict) else None
         )
 
