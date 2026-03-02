@@ -30,7 +30,9 @@ def _build_path_pattern(
         for param_name, param_matcher in query_params.items():
             if isinstance(param_matcher, dict) and "equalTo" in param_matcher:
                 value = re.escape(pattern=str(object=param_matcher["equalTo"]))
-                lookaheads.append(f"(?=.*{re.escape(pattern=param_name)}={value})")
+                lookaheads.append(
+                    f"(?=.*{re.escape(pattern=param_name)}={value})"
+                )
         if lookaheads:
             full_pattern += r"\?" + "".join(lookaheads) + r".*"
 
