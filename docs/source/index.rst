@@ -1,25 +1,14 @@
-|Build Status| |PyPI|
+|project|
+=========
 
-wiremock-mock
-=============
-
-Serve WireMock stubs as a mock with `respx`_.
+|project| serves WireMock stubs as a mock with `respx`_.
 
 Requires Python |minimum-python-version|\+.
-
-.. contents::
-   :local:
 
 Installation
 ------------
 
-.. code-block:: console
-
-   uv pip install wiremock-mock
-
-Or with pip:
-
-.. code-block:: console
+.. code-block:: shell
 
    pip install wiremock-mock
 
@@ -56,11 +45,11 @@ Usage
            mock_obj=m, stubs=stubs, base_url="http://notion-mock.test"
        )
        response = httpx.get(url="http://notion-mock.test/v1/pages")
-       assert response.status_code == HTTPStatus.OK  # noqa: S101
+       assert response.status_code == HTTPStatus.OK
 
-This lets you use existing WireMock stub files (e.g. from the WireMock Admin API
-import format) without running WireMock in Docker. All HTTP traffic is mocked at
-the ``httpx`` level via respx. To load stubs from a JSON file, use
+This lets you use existing WireMock stub files (e.g. from the WireMock Admin
+API import format) without running WireMock in Docker. All HTTP traffic is
+mocked at the ``httpx`` level via respx. To load stubs from a JSON file, use
 ``json.loads(path.read_text())``.
 
 Supported stub features
@@ -70,10 +59,15 @@ Supported stub features
 - **Query parameters**: ``queryParameters`` with ``equalTo``
 - **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
 
-.. _respx: https://lundberg.github.io/respx/
+Reference
+---------
 
-.. |Build Status| image:: https://github.com/adamtheturtle/wiremock-mock/actions/workflows/ci.yml/badge.svg?branch=main
-   :target: https://github.com/adamtheturtle/wiremock-mock/actions
-.. |PyPI| image:: https://badge.fury.io/py/wiremock-mock.svg
-   :target: https://badge.fury.io/py/wiremock-mock
-.. |minimum-python-version| replace:: 3.12
+.. toctree::
+   :maxdepth: 3
+
+   api-reference
+   release-process
+   changelog
+   contributing
+
+.. _respx: https://lundberg.github.io/respx/
