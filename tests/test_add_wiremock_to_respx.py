@@ -10,6 +10,8 @@ from wiremock_mock import add_wiremock_to_respx
 
 BASE_URL = "http://notion-mock.test"
 
+_PAGE_ID = "59833787-2cf9-4fdf-8782-e53db20768a5"
+
 
 def test_add_wiremock_to_respx_simple_get() -> None:
     """Add_wiremock_to_respx adds a simple GET stub."""
@@ -59,11 +61,11 @@ def test_add_wiremock_to_respx_patch() -> None:
             {
                 "request": {
                     "method": "PATCH",
-                    "urlPath": "/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5",
+                    "urlPath": f"/v1/pages/{_PAGE_ID}",
                 },
                 "response": {
                     "status": 200,
-                    "jsonBody": {"object": "page", "id": "59833787-2cf9-4fdf-8782-e53db20768a5"},
+                    "jsonBody": {"object": "page", "id": _PAGE_ID},
                 },
             },
         ],
@@ -71,7 +73,7 @@ def test_add_wiremock_to_respx_patch() -> None:
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
         response = httpx.patch(
-            url=f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5",
+            url=f"{BASE_URL}/v1/pages/{_PAGE_ID}",
             json={"properties": {}},
         )
         assert response.status_code == HTTPStatus.OK
@@ -82,7 +84,10 @@ def test_add_wiremock_to_respx_delete() -> None:
     stubs = {
         "mappings": [
             {
-                "request": {"method": "DELETE", "urlPath": "/v1/blocks/block-123"},
+                "request": {
+                    "method": "DELETE",
+                    "urlPath": "/v1/blocks/block-123",
+                },
                 "response": {"status": 200},
             },
         ],
@@ -95,6 +100,7 @@ def test_add_wiremock_to_respx_delete() -> None:
 
 def test_add_wiremock_to_respx_with_query_parameters() -> None:
     """Add_wiremock_to_respx matches query parameters with equalTo."""
+    _block_id = "cccc0000-0000-0000-0000-000000000010"
     stubs = {
         "mappings": [
             {
@@ -102,7 +108,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
                     "method": "GET",
                     "urlPath": "/v1/comments",
                     "queryParameters": {
-                        "block_id": {"equalTo": "cccc0000-0000-0000-0000-000000000010"},
+                        "block_id": {"equalTo": _block_id},
                     },
                 },
                 "response": {
@@ -116,7 +122,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
         response = httpx.get(
             url=f"{BASE_URL}/v1/comments",
-            params={"block_id": "cccc0000-0000-0000-0000-000000000010"},
+            params={"block_id": _block_id},
         )
         assert response.status_code == HTTPStatus.OK
 
@@ -139,7 +145,7 @@ def test_add_wiremock_to_respx_url_path_pattern() -> None:
     }
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
-        response = httpx.get(url=f"{BASE_URL}/v1/pages/59833787-2cf9-4fdf-8782-e53db20768a5")
+        response = httpx.get(url=f"{BASE_URL}/v1/pages/{_PAGE_ID}")
         assert response.status_code == HTTPStatus.OK
 
 
@@ -162,7 +168,10 @@ def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
     stubs = {
         "mappings": [
             {
-                "request": {"method": "GET", "urlPathPattern": r"/v1/blocks/.+"},
+                "request": {
+                    "method": "GET",
+                    "urlPathPattern": r"/v1/blocks/.+",
+                },
                 "response": {"status": 200, "jsonBody": {"object": "block"}},
             },
         ],
@@ -212,8 +221,14 @@ def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
         "mappings": [
             "not-a-dict",
             {"request": "invalid", "response": {"status": 200}},
-            {"request": {"method": "GET", "urlPath": "/ok"}, "response": "invalid"},
-            {"request": {"method": 123, "urlPath": "/ok"}, "response": {"status": 200}},
+            {
+                "request": {"method": "GET", "urlPath": "/ok"},
+                "response": "invalid",
+            },
+            {
+                "request": {"method": 123, "urlPath": "/ok"},
+                "response": {"status": 200},
+            },
             {"request": {}, "response": {"status": 200}},
             {
                 "request": {"method": "GET", "urlPath": "/valid"},
@@ -267,5 +282,5 @@ def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
         response = httpx.get(url=f"{BASE_URL}/v1/edge")
-        assert response.status_code == 200
+        assert response.status_code == HTTPStatus.OK
         assert response.json() == {"ok": True}
