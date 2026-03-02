@@ -163,6 +163,7 @@ lint.mccabe.max-complexity = 12
     "too-many-arguments",
     "too-many-instance-attributes",
     "too-many-return-statements",
+    "too-many-branches",
     "too-many-lines",
     "locally-disabled",
     # Let ruff handle long lines
@@ -178,6 +179,8 @@ lint.mccabe.max-complexity = 12
     "duplicate-code",
     # Let ruff handle imports
     "wrong-import-order",
+    # Python 3.15+ sets a default encoding; not relevant for our supported versions
+    "unspecified-encoding",
 ]
 # We ignore invalid names because:
 # - We want to use generated module names, which may not be valid, but are never seen.
