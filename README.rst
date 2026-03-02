@@ -31,13 +31,14 @@ Usage
    """Example usage of wiremock-mock."""
 
    from http import HTTPStatus
+   from typing import Any
 
    import httpx
    import respx
 
    from wiremock_mock import add_wiremock_to_respx
 
-   stubs = {
+   stubs: dict[str, Any] = {
        "mappings": [
            {
                "request": {"method": "GET", "urlPath": "/v1/pages"},
