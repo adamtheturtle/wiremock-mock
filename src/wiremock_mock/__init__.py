@@ -157,13 +157,13 @@ def add_wiremock_to_respx(
         if json_body is not None:
             response = httpx.Response(
                 status_code=status,
-                headers=dict(headers),
+                headers=headers,
                 json=json_body,
             )
         elif body is not None:
             response = httpx.Response(
                 status_code=status,
-                headers=dict(headers),
+                headers=headers,
                 content=(
                     body
                     if isinstance(body, bytes)
@@ -173,7 +173,7 @@ def add_wiremock_to_respx(
         else:
             response = httpx.Response(
                 status_code=status,
-                headers=dict(headers),
+                headers=headers,
             )
 
         url_pattern = _build_path_pattern(
