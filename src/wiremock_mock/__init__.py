@@ -72,7 +72,7 @@ def _build_path_pattern(
         if lookaheads:
             full_pattern += r"\?" + "".join(lookaheads) + r".*"
 
-    full_pattern += r"$"
+    full_pattern += r"(\?.*)?$"
     return re.compile(pattern=full_pattern)
 
 
