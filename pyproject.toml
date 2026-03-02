@@ -142,7 +142,6 @@ ignore = [
     "CHANGELOG.rst",
     "CODE_OF_CONDUCT.rst",
     "CONTRIBUTING.rst",
-    "LICENSE",
     "Makefile",
     "ci",
     "ci/**",
