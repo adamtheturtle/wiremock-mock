@@ -5,7 +5,7 @@ requires = [ "setuptools", "setuptools-scm>=8.1.0" ]
 [project]
 name = "wiremock-mock"
 description = "Serve WireMock stubs as a mock with respx."
-readme = { file = "README.rst", content-type = "text/x-rst" }
+readme = {file = "README.rst", content-type = "text/x-rst"}
 keywords = [
     "httpx",
     "mock",
@@ -13,7 +13,7 @@ keywords = [
     "wiremock",
 ]
 license = "MIT"
-license-files = [ "LICENSE" ]
+license-files = ["LICENSE"]
 authors = [
     { name = "Adam Dangoor", email = "adamdangoor@gmail.com" },
 ]
@@ -45,11 +45,11 @@ optional-dependencies.dev = [
     "interrogate==1.7.0",
     "mypy[faster-cache]==1.19.1",
     "mypy-strict-kwargs==2026.1.12",
-    "prek==0.3.3",
+    "prek==0.3.4",
     "pydocstringformatter==0.7.5",
     "pylint[spelling]==4.0.5",
     "pylint-per-file-ignores==3.2.0",
-    "pyproject-fmt==2.16.2",
+    "pyproject-fmt==2.17.0",
     "pyrefly==0.54.0",
     "pyright==1.1.408",
     "pyroma==5.0.1",
@@ -74,7 +74,7 @@ optional-dependencies.dev = [
     "yamlfix==1.19.1",
     "zizmor==1.22.0",
 ]
-optional-dependencies.release = [ "check-wheel-contents==0.6.3" ]
+optional-dependencies.release = ["check-wheel-contents==0.6.3"]
 urls.Documentation = "https://adamtheturtle.github.io/wiremock-mock/"
 urls.Source = "https://github.com/adamtheturtle/wiremock-mock"
 
@@ -274,9 +274,9 @@ report.show_missing = true
 
 [tool.mypy]
 strict = true
-files = [ "." ]
-exclude = [ "build" ]
-plugins = [ "mypy_strict_kwargs" ]
+files = ["."]
+exclude = ["build"]
+plugins = ["mypy_strict_kwargs"]
 follow_untyped_imports = true
 
 [tool.pyrefly]
@@ -363,7 +363,7 @@ ignore_names = [
     "warning_is_error",
 ]
 # Duplicate some of .gitignore
-exclude = [ ".venv" ]
+exclude = [".venv"]
 
 [tool.yamlfix]
 section_whitelines = 1
