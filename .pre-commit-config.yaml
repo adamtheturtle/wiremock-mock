@@ -193,7 +193,7 @@ repos:
       - id: pyright-verifytypes
         name: pyright-verifytypes
         stages: [pre-push]
-        entry: uv run --extra=dev -m pyright --verifytypes wiremock_mock
+        entry: uv run --extra=dev -m pyright --verifytypes wiremock_mock --ignoreexternal
         language: python
         pass_filenames: false
         types_or: [python]
