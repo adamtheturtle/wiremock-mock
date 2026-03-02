@@ -39,7 +39,7 @@ def _build_path_pattern(
 
 
 @beartype
-def add_wiremock_to_respx(
+def add_wiremock_to_respx(  # noqa: PLR0912
     *,
     mock_obj: respx.MockRouter | respx.Router,
     stubs: dict[str, Any],
@@ -69,7 +69,9 @@ def add_wiremock_to_respx(
             continue
         request_spec = mapping.get("request")
         response_spec = mapping.get("response")
-        if not isinstance(request_spec, dict) or not isinstance(response_spec, dict):
+        if not isinstance(request_spec, dict) or not isinstance(
+            response_spec, dict
+        ):
             continue
 
         method = request_spec.get("method", "GET")
@@ -88,7 +90,11 @@ def add_wiremock_to_respx(
             continue
 
         path = str(object=url_path) if url_path is not None else ""
-        path_pattern = str(object=url_path_pattern) if url_path_pattern is not None else None
+        path_pattern = (
+            str(object=url_path_pattern)
+            if url_path_pattern is not None
+            else None
+        )
 
         status = response_spec.get("status", 200)
         if not isinstance(status, int):
@@ -109,7 +115,11 @@ def add_wiremock_to_respx(
             response = httpx.Response(
                 status_code=status,
                 headers=dict(headers),
-                content=body if isinstance(body, bytes) else str(object=body).encode(),
+                content=(
+                    body
+                    if isinstance(body, bytes)
+                    else str(object=body).encode()
+                ),
             )
         else:
             response = httpx.Response(
@@ -124,7 +134,8 @@ def add_wiremock_to_respx(
             query_params=query_params,
         )
 
-        mock_obj.route(method=method, url=url_pattern).mock(return_value=response)
+        route = mock_obj.route(method=method, url=url_pattern)
+        route.mock(return_value=response)
 
 
 __all__ = ["add_wiremock_to_respx"]

@@ -1,7 +1,13 @@
+Changelog
 JSON
 Pytest
 beartype
+equalTo
 httpx
+jsonBody
 params
+queryParameters
 respx
+urlPath
+urlPathPattern
 wiremock
