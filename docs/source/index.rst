@@ -17,6 +17,8 @@ Usage
 
 .. code-block:: python
 
+   """Example usage of wiremock-mock."""
+
    from http import HTTPStatus
 
    import httpx
@@ -41,7 +43,7 @@ Usage
        add_wiremock_to_respx(
            mock_obj=m, stubs=stubs, base_url="http://notion-mock.test"
        )
-       response = httpx.get("http://notion-mock.test/v1/pages")
+       response = httpx.get(url="http://notion-mock.test/v1/pages")
        assert response.status_code == HTTPStatus.OK
 
 This lets you use existing WireMock stub files (e.g. from the WireMock Admin

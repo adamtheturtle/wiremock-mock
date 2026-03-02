@@ -1,7 +1,7 @@
+JSON
+Pytest
 beartype
 httpx
-JSON
 params
-Pytest
 respx
 wiremock
