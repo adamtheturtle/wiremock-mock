@@ -88,10 +88,10 @@ def add_wiremock_to_respx(
 
     Supports request matching by:
     - method
-    - urlPath (exact) or urlPathPattern (regex)
-    - queryParameters with equalTo
+    - ``urlPath`` (exact) or ``urlPathPattern`` (regex)
+    - ``queryParameters`` with ``equalTo``
 
-    Response uses status, headers, and jsonBody from each stub.
+    Response uses status, headers, and ``jsonBody`` from each stub.
 
     :param mock_obj: The respx MockRouter or Router to add routes to.
     :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
