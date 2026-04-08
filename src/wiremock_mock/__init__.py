@@ -8,12 +8,12 @@ import respx
 from beartype import beartype
 
 
-def _is_dict(value: object) -> TypeGuard[dict[str, Any]]:
+def _is_dict(value: object, /) -> TypeGuard[dict[str, Any]]:
     """Check if a value is a dict, narrowing to ``dict[str, Any]``."""
     return isinstance(value, dict)
 
 
-def _is_list(value: object) -> TypeGuard[list[Any]]:
+def _is_list(value: object, /) -> TypeGuard[list[Any]]:
     """Check if a value is a list, narrowing to ``list[Any]``."""
     return isinstance(value, list)
 
@@ -39,7 +39,7 @@ def _build_path_pattern(
     if query_params:
         lookaheads: list[str] = []
         for param_name, param_matcher in query_params.items():
-            if not _is_dict(value=param_matcher):
+            if not _is_dict(param_matcher):
                 continue
             eq_val = param_matcher.get("equalTo")
             if eq_val is not None:
@@ -77,16 +77,16 @@ def add_wiremock_to_respx(
     :param base_url: Base URL for all routes. Must match ``respx.mock()``.
     """
     raw: object = stubs.get("mappings") or []
-    if not _is_list(value=raw):
+    if not _is_list(raw):
         return
 
     for item in raw:
-        if not _is_dict(value=item):
+        if not _is_dict(item):
             continue
 
         request_raw = item.get("request")
         response_raw = item.get("response")
-        if not _is_dict(value=request_raw) or not _is_dict(value=response_raw):
+        if not _is_dict(request_raw) or not _is_dict(response_raw):
             continue
         method_raw: object = request_raw.get("method") or "GET"
         if not isinstance(method_raw, str):
@@ -97,7 +97,7 @@ def add_wiremock_to_respx(
         url_path_pattern = request_raw.get("urlPathPattern")
         query_params_raw = request_raw.get("queryParameters")
         query_params: dict[str, Any] | None = (
-            query_params_raw if _is_dict(value=query_params_raw) else None
+            query_params_raw if _is_dict(query_params_raw) else None
         )
 
         if url_path is None and url_path_pattern is None:
@@ -114,9 +114,7 @@ def add_wiremock_to_respx(
         status = status_raw if isinstance(status_raw, int) else 200
 
         headers_raw = response_raw.get("headers")
-        headers: dict[str, str] = (
-            headers_raw if _is_dict(value=headers_raw) else {}
-        )
+        headers: dict[str, str] = headers_raw if _is_dict(headers_raw) else {}
 
         json_body = response_raw.get("jsonBody")
         body = response_raw.get("body")
