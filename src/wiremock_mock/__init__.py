@@ -1,42 +1,21 @@
 """Package for serving WireMock stubs as a mock with respx."""
 
 import re
-from typing import Any, TypedDict, cast
+from typing import Any, TypeGuard
 
 import httpx
 import respx
 from beartype import beartype
 
 
-class _QueryParamMatcher(TypedDict, total=False):
-    """A WireMock query parameter matcher."""
-
-    equalTo: object
-
-
-class _RequestSpec(TypedDict, total=False):
-    """A WireMock request specification."""
-
-    method: object
-    urlPath: object
-    urlPathPattern: object
-    queryParameters: object
+def _is_dict(value: object, /) -> TypeGuard[dict[str, Any]]:
+    """Check if a value is a dict, narrowing to ``dict[str, Any]``."""
+    return isinstance(value, dict)
 
 
-class _ResponseSpec(TypedDict, total=False):
-    """A WireMock response specification."""
-
-    status: object
-    headers: object
-    jsonBody: object
-    body: object
-
-
-class _Mapping(TypedDict, total=False):
-    """A WireMock stub mapping."""
-
-    request: object
-    response: object
+def _is_list(value: object, /) -> TypeGuard[list[Any]]:
+    """Check if a value is a list, narrowing to ``list[Any]``."""
+    return isinstance(value, list)
 
 
 def _build_path_pattern(
@@ -44,7 +23,7 @@ def _build_path_pattern(
     base_url: str,
     path: str,
     path_pattern: str | None,
-    query_params: dict[str, object] | None,
+    query_params: dict[str, Any] | None,
 ) -> re.Pattern[str]:
     """Build a URL pattern for matching requests."""
     base = base_url.rstrip("/")
@@ -60,10 +39,9 @@ def _build_path_pattern(
     if query_params:
         lookaheads: list[str] = []
         for param_name, param_matcher in query_params.items():
-            if not isinstance(param_matcher, dict):
+            if not _is_dict(param_matcher):
                 continue
-            eq_matcher = cast("_QueryParamMatcher", param_matcher)
-            eq_val = eq_matcher.get("equalTo")
+            eq_val = param_matcher.get("equalTo")
             if eq_val is not None:
                 value = re.escape(pattern=str(object=eq_val))
                 lookaheads.append(
@@ -99,36 +77,27 @@ def add_wiremock_to_respx(
     :param base_url: Base URL for all routes. Must match ``respx.mock()``.
     """
     raw: object = stubs.get("mappings") or []
-    if not isinstance(raw, list):
+    if not _is_list(raw):
         return
-    mappings = cast("list[object]", raw)
 
-    for item in mappings:
-        if not isinstance(item, dict):
+    for item in raw:
+        if not _is_dict(item):
             continue
-        mapping = cast("_Mapping", item)
 
-        request_raw = mapping.get("request")
-        response_raw = mapping.get("response")
-        if not isinstance(request_raw, dict) or not isinstance(
-            response_raw, dict
-        ):
+        request_raw = item.get("request")
+        response_raw = item.get("response")
+        if not _is_dict(request_raw) or not _is_dict(response_raw):
             continue
-        request_spec = cast("_RequestSpec", request_raw)
-        response_spec = cast("_ResponseSpec", response_raw)
-
-        method_raw: object = request_spec.get("method") or "GET"
+        method_raw: object = request_raw.get("method") or "GET"
         if not isinstance(method_raw, str):
             continue
         method = method_raw.upper()
 
-        url_path = request_spec.get("urlPath")
-        url_path_pattern = request_spec.get("urlPathPattern")
-        query_params_raw = request_spec.get("queryParameters")
-        query_params: dict[str, object] | None = (
-            cast("dict[str, object]", query_params_raw)
-            if isinstance(query_params_raw, dict)
-            else None
+        url_path = request_raw.get("urlPath")
+        url_path_pattern = request_raw.get("urlPathPattern")
+        query_params_raw = request_raw.get("queryParameters")
+        query_params: dict[str, Any] | None = (
+            query_params_raw if _is_dict(query_params_raw) else None
         )
 
         if url_path is None and url_path_pattern is None:
@@ -141,18 +110,14 @@ def add_wiremock_to_respx(
             else None
         )
 
-        status_raw = response_spec.get("status")
+        status_raw = response_raw.get("status")
         status = status_raw if isinstance(status_raw, int) else 200
 
-        headers_raw = response_spec.get("headers")
-        headers: dict[str, str] = (
-            cast("dict[str, str]", headers_raw)
-            if isinstance(headers_raw, dict)
-            else {}
-        )
+        headers_raw = response_raw.get("headers")
+        headers: dict[str, str] = headers_raw if _is_dict(headers_raw) else {}
 
-        json_body = response_spec.get("jsonBody")
-        body = response_spec.get("body")
+        json_body = response_raw.get("jsonBody")
+        body = response_raw.get("body")
 
         if json_body is not None:
             response = httpx.Response(

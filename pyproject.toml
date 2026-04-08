@@ -36,7 +36,7 @@ dependencies = [
     "respx>=0.22.0",
 ]
 optional-dependencies.dev = [
-    "actionlint-py==1.7.12.24",
+    "actionlint-py==1.7.11.24",
     "check-manifest==0.51",
     "deptry==0.25.1",
     "doc8==2.0.0",
@@ -48,14 +48,14 @@ optional-dependencies.dev = [
     "prek==0.3.8",
     "pydocstringformatter==0.7.5",
     "pylint[spelling]==4.0.5",
-    "pylint-per-file-ignores==3.2.1",
-    "pyproject-fmt==2.21.0",
-    "pyrefly==0.60.0",
+    "pylint-per-file-ignores==3.2.0",
+    "pyproject-fmt==2.20.0",
+    "pyrefly==0.58.0",
     "pyright==1.1.408",
     "pyroma==5.0.1",
-    "pytest==9.0.3",
+    "pytest==9.0.2",
     "pytest-cov==7.1.0",
-    "ruff==0.15.9",
+    "ruff==0.15.8",
     # We add shellcheck-py not only for shell scripts and shell code blocks,
     # but also because having it installed means that ``actionlint-py`` will
     # use it to lint shell commands in GitHub workflow files.
@@ -68,7 +68,7 @@ optional-dependencies.dev = [
     "sphinx-substitution-extensions==2026.1.12",
     "sphinxcontrib-spelling==8.0.2",
     "sybil[pytest]==10.0.1",
-    "ty==0.0.29",
+    "ty==0.0.26",
     "types-requests>=2.32.0",
     "vulture==2.16",
     "yamlfix==1.19.1",
