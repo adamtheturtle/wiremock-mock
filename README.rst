@@ -70,6 +70,11 @@ Supported stub features
 - **Query parameters**: ``queryParameters`` with ``equalTo``
 - **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
 
+Full documentation
+------------------
+
+See the `full documentation <https://wiremock-mock.readthedocs.io/en/latest/>`__ for more information including how to contribute.
+
 .. _respx: https://lundberg.github.io/respx/
 
 .. |Build Status| image:: https://github.com/adamtheturtle/wiremock-mock/actions/workflows/ci.yml/badge.svg?branch=main
