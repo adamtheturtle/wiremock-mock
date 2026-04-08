@@ -107,7 +107,7 @@ lint.ignore = [
     # Ruff warns that this conflicts with the formatter.
     "ISC001",
 ]
-lint.per-file-ignores."docs/source/doccmd_*.py" = [
+lint.per-file-ignores."doccmd_*.py" = [
     # Allow 'assert' in documentation code examples.
     "S101",
 ]
