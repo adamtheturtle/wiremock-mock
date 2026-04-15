@@ -199,6 +199,23 @@ def test_add_wiremock_to_respx_body_response() -> None:
         assert response.text == "plain text"
 
 
+def test_add_wiremock_to_respx_body_bytes_response() -> None:
+    """Add_wiremock_to_respx supports bytes body response."""
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {"method": "GET", "urlPath": "/v1/bin"},
+                "response": {"status": 200, "body": b"binary data"},
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        response = httpx.get(url=f"{BASE_URL}/v1/bin")
+        assert response.status_code == HTTPStatus.OK
+        assert response.content == b"binary data"
+
+
 def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
     """Add_wiremock_to_respx adds leading slash when urlPath lacks it."""
     stubs: dict[str, Any] = {
