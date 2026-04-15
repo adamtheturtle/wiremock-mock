@@ -63,12 +63,25 @@ import format) without running WireMock in Docker. All HTTP traffic is mocked at
 the ``httpx`` level via respx. To load stubs from a JSON file, use
 ``json.loads(path.read_text())``.
 
+Use cases
+---------
+
+- Use existing WireMock stub files without running WireMock in Docker
+- Test against external APIs (e.g. Notion) without network access
+- Reuse stubs exported from WireMock Admin API or recorded mappings
+- Run tests in CI without Docker/socket dependencies
+
 Supported stub features
 -----------------------
 
 - **Request matching**: ``method``, ``urlPath`` (exact), ``urlPathPattern`` (regex)
 - **Query parameters**: ``queryParameters`` with ``equalTo``
 - **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
+
+Full documentation
+------------------
+
+See the `full documentation <https://wiremock-mock.readthedocs.io/en/latest/>`__ for more information including how to contribute.
 
 .. _respx: https://lundberg.github.io/respx/
 
