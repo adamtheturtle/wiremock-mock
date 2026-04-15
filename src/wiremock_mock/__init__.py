@@ -30,7 +30,7 @@ def _build_path_pattern(
         lookaheads: list[str] = []
         for param_name, param_matcher in query_params.items():
             match param_matcher:
-                case {"equalTo": eq_val}:
+                case {"equalTo": eq_val} if eq_val is not None:
                     value = re.escape(pattern=str(object=eq_val))
                     lookaheads.append(
                         f"(?=.*{re.escape(pattern=param_name)}={value})"
@@ -79,10 +79,16 @@ def _build_response(
                 headers=headers,
                 content=s.encode(),
             )
-        case _:
+        case None:
             return httpx.Response(
                 status_code=status,
                 headers=headers,
+            )
+        case other:
+            return httpx.Response(
+                status_code=status,
+                headers=headers,
+                content=str(object=other).encode(),
             )
 
 
@@ -132,6 +138,7 @@ def add_wiremock_to_respx(
         url_path = request_raw.get("urlPath")
         url_path_pattern = request_raw.get("urlPathPattern")
 
+        query_params: dict[str, Any] | None
         match request_raw.get("queryParameters"):
             case dict() as query_params:
                 pass
