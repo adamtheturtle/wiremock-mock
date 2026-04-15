@@ -324,11 +324,11 @@ ignore_names = [
     "base_url",
     "request",
     # Internal TypedDict classes used via cast() string literals
-    "_Mapping",
     "_QueryParamMatcher",
     "_RequestSpec",
     "_ResponseSpec",
     # TypedDict fields accessed via string keys (not attribute access)
+    "body",
     "equalTo",
     "jsonBody",
     "queryParameters",
