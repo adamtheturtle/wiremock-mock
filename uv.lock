@@ -1282,6 +1282,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-beartype-tests"
+version = "2026.4.19.1.post5+gbc81d99a1"
+source = { git = "https://github.com/adamtheturtle/pytest-beartype-tests.git?rev=bc81d99#bc81d99a1041e4d24bd67a2eec077b6d6616e712" }
+dependencies = [
+    { name = "beartype" },
+    { name = "pytest" },
+]
+
+[[package]]
 name = "pytest-cov"
 version = "7.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2012,6 +2021,7 @@ dev = [
     { name = "pyright" },
     { name = "pyroma" },
     { name = "pytest" },
+    { name = "pytest-beartype-tests" },
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "shellcheck-py" },
@@ -2056,6 +2066,7 @@ requires-dist = [
     { name = "pyright", marker = "extra == 'dev'", specifier = "==1.1.408" },
     { name = "pyroma", marker = "extra == 'dev'", specifier = "==5.0.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==9.0.3" },
+    { name = "pytest-beartype-tests", marker = "extra == 'dev'", git = "https://github.com/adamtheturtle/pytest-beartype-tests.git?rev=bc81d99" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==7.1.0" },
     { name = "respx", specifier = ">=0.22.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.11" },
@@ -2075,6 +2086,9 @@ requires-dist = [
     { name = "zizmor", marker = "extra == 'dev'", specifier = "==1.24.1" },
 ]
 provides-extras = ["dev", "release"]
+
+[package.metadata.requires-dev]
+dev = []
 
 [[package]]
 name = "yamlfix"
