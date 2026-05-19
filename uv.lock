@@ -450,7 +450,7 @@ wheels = [
 
 [[package]]
 name = "doccmd"
-version = "2026.5.16"
+version = "2026.5.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
@@ -463,9 +463,9 @@ dependencies = [
     { name = "sybil" },
     { name = "sybil-extras" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/15/e5/567d5a5cf549de53b66b296a4330c7b3728790e37942a5e1adb171d4c12d/doccmd-2026.5.16.tar.gz", hash = "sha256:85a9fc3f8b016a7818f0d05e93900f1c44ebfef418cd559f2aec3e0437925615", size = 191828, upload-time = "2026-05-16T07:58:44.057Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/72/cc62f14a3dc6f1151f9ac64e657dc36674e6d297be630775f6b51ffcfe47/doccmd-2026.5.19.tar.gz", hash = "sha256:3ba7f324fa329744109677737814233b9fde666e25929f24bf321a582162f2e7", size = 192425, upload-time = "2026-05-19T11:13:36.194Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/de/07e81c13e84a31e613ebe0b8a6c5ff3869d87d6da7a185cf92f78e83d69d/doccmd-2026.5.16-py2.py3-none-any.whl", hash = "sha256:a50018daf5d5ecd35691b417034c73413fd9908b64f9c36da9423876e88cb3ee", size = 22597, upload-time = "2026-05-16T07:58:42.074Z" },
+    { url = "https://files.pythonhosted.org/packages/65/40/49087a337292f0775d8327f339509044414ab4e0295aa2c47422633a1470/doccmd-2026.5.19-py2.py3-none-any.whl", hash = "sha256:6778d2cb16273b9d1c74a27c599970bb4bb9f3570d76ae6ddbc2ea33f3f80fb7", size = 22785, upload-time = "2026-05-19T11:13:33.952Z" },
 ]
 
 [[package]]
@@ -908,15 +908,14 @@ wheels = [
 
 [[package]]
 name = "mypy-strict-kwargs"
-version = "2026.1.12"
+version = "2026.5.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mypy" },
-    { name = "tomli" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8c/77/869682567b0953f3f9ea6b44639a2a520e0976679a93e4fd4a91840ac43a/mypy_strict_kwargs-2026.1.12.tar.gz", hash = "sha256:abc688be88661e14f19626e00686f42cc6ce3a959e9cd86e0523dee2b5509cac", size = 18756, upload-time = "2026-01-12T06:12:03.509Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/06/f4439b419089bb4ad5fa9f5ca16be94b01599f081e32354c13943e7ac897/mypy_strict_kwargs-2026.5.19.tar.gz", hash = "sha256:386dd2195a25cbd1bf0183e6c24bce8ec765a0f110329dac622fc02135cb0bd4", size = 20000, upload-time = "2026-05-19T11:51:43.362Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/93/918273959da1d3364478742f45e5579489acd100a6184061f57d64b37be7/mypy_strict_kwargs-2026.1.12-py2.py3-none-any.whl", hash = "sha256:54529ed7d9912be26f4aedb200e5c4d577fb592398c4038b551a3a07ea83361d", size = 7095, upload-time = "2026-01-12T06:12:01.884Z" },
+    { url = "https://files.pythonhosted.org/packages/78/6f/9486d091884361ca4137dab3e2543dcced410d40d9b8604a0ba4c932799a/mypy_strict_kwargs-2026.5.19-py2.py3-none-any.whl", hash = "sha256:3c3ef1f45d6dbca0800ddddff8f521d33f35a2d9e753f68d06f634b8622c3e26", size = 7772, upload-time = "2026-05-19T11:51:41.695Z" },
 ]
 
 [[package]]
@@ -1848,15 +1847,15 @@ wheels = [
 
 [[package]]
 name = "strict-kwargs"
-version = "2026.5.18.post1"
+version = "2026.5.19.post1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ty" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/1b/748e7c411a22c26bd8488d4f7b25aaf72c72c2ed68a4e61f0fe802d02136/strict_kwargs-2026.5.18.post1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:72241056a9bf0bfb9c522c5e888ef9868556fa2475890b90f29ae78b837eefb9", size = 2184045, upload-time = "2026-05-18T14:42:59.32Z" },
-    { url = "https://files.pythonhosted.org/packages/d2/76/a3a6fa1082e30fdd8dee750bac496e1595d963e1155572e4ffb3f1cb3761/strict_kwargs-2026.5.18.post1-py3-none-manylinux_2_39_x86_64.whl", hash = "sha256:7dea7f9ba8557f57fbf56309735780c1d0b83627f237aeb77f1ee50b7020ac4c", size = 2294579, upload-time = "2026-05-18T14:43:01.989Z" },
-    { url = "https://files.pythonhosted.org/packages/62/75/15f0de12cf822ff2d1a098fdbe70d57c9d262868dfd728d5ea9cb3104234/strict_kwargs-2026.5.18.post1-py3-none-win_amd64.whl", hash = "sha256:eaad5813f39f338eaa3674aec6bf1463fc3ab2ce47f188262592486645d77132", size = 2069130, upload-time = "2026-05-18T14:43:03.323Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/45/9d6b7b03e9b5513dae59182bab05543409468aea77841da8c403c61d9ceb/strict_kwargs-2026.5.19.post1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:35499102547c410418edd4da533f19c85f5cb1c6744c670975a6b4591e8b2bf8", size = 2191838, upload-time = "2026-05-19T11:01:16.418Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/e1/edcaf1bb90ff778adb1e5613b05a7385f6a061bcd3b976718a82bc0f5fd5/strict_kwargs-2026.5.19.post1-py3-none-manylinux_2_39_x86_64.whl", hash = "sha256:cece04db61680b521d8c440f58d504e36151e2fcdba7128fbe47e9ebee8ab62b", size = 2298036, upload-time = "2026-05-19T11:01:19.372Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/75/7c43d1d64d3e9e466be4b363b88feffd6bf8efcee94fb73f857e2c5f198d/strict_kwargs-2026.5.19.post1-py3-none-win_amd64.whl", hash = "sha256:f76888366373bfc68a4054b3950db62bbf5f6f0cc41105174075a1c2d5449a2f", size = 2082398, upload-time = "2026-05-19T11:01:21.467Z" },
 ]
 
 [[package]]
@@ -2138,12 +2137,12 @@ requires-dist = [
     { name = "check-wheel-contents", marker = "extra == 'release'", specifier = "==0.6.3" },
     { name = "deptry", marker = "extra == 'dev'", specifier = "==0.25.1" },
     { name = "doc8", marker = "extra == 'dev'", specifier = "==2.0.0" },
-    { name = "doccmd", marker = "extra == 'dev'", specifier = "==2026.5.16" },
+    { name = "doccmd", marker = "extra == 'dev'", specifier = "==2026.5.19" },
     { name = "furo", marker = "extra == 'dev'", specifier = "==2025.12.19" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "interrogate", marker = "extra == 'dev'", specifier = "==1.7.0" },
     { name = "mypy", extras = ["faster-cache"], marker = "extra == 'dev'", specifier = "==2.1.0" },
-    { name = "mypy-strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.1.12" },
+    { name = "mypy-strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.5.19" },
     { name = "prek", marker = "extra == 'dev'", specifier = "==0.4.0" },
     { name = "pydocstringformatter", marker = "extra == 'dev'", specifier = "==0.7.5" },
     { name = "pylint", extras = ["spelling"], marker = "extra == 'dev'", specifier = "==4.0.5" },
@@ -2165,7 +2164,7 @@ requires-dist = [
     { name = "sphinx-pyproject", marker = "extra == 'dev'", specifier = "==0.3.0" },
     { name = "sphinx-substitution-extensions", marker = "extra == 'dev'", specifier = "==2026.1.12" },
     { name = "sphinxcontrib-spelling", marker = "extra == 'dev'", specifier = "==8.0.2" },
-    { name = "strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.5.18.post1" },
+    { name = "strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.5.19.post1" },
     { name = "sybil", extras = ["pytest"], marker = "extra == 'dev'", specifier = "==10.0.1" },
     { name = "ty", marker = "extra == 'dev'", specifier = "==0.0.37" },
     { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.32.0" },
