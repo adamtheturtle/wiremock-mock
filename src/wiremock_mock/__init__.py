@@ -1,7 +1,7 @@
 """Package for serving WireMock stubs as a mock with respx."""
 
 import re
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict
 
 import httpx
 import respx
@@ -55,7 +55,7 @@ def _build_path_pattern(
         for param_name, param_matcher in query_params.items():
             if not isinstance(param_matcher, dict):
                 continue
-            eq_matcher = cast("_QueryParamMatcher", param_matcher)
+            eq_matcher: _QueryParamMatcher = param_matcher
             match eq_matcher:
                 case {"equalTo": eq_val} if eq_val is not None:
                     value = re.escape(pattern=str(object=eq_val))
@@ -83,11 +83,12 @@ def _build_response(
             status = 200
 
     headers_raw = response_spec.get("headers")
-    headers: dict[str, str] = (
-        cast("dict[str, str]", headers_raw)
-        if isinstance(headers_raw, dict)
-        else {}
-    )
+    headers: dict[str, str]
+    match headers_raw:
+        case dict() as raw_headers:
+            headers = raw_headers
+        case _:
+            headers = {}
 
     json_body = response_spec.get("jsonBody")
     if json_body is not None:
@@ -148,19 +149,17 @@ def add_wiremock_to_respx(
     raw: object = stubs.get("mappings") or []
     if not isinstance(raw, list):
         return
-    mappings = cast("list[object]", raw)
-
-    for item in mappings:
+    for item in raw:
         if not isinstance(item, dict):
             continue
-        mapping = cast("dict[str, object]", item)
+        mapping: dict[str, object] = item
         match mapping:
             case {
-                "request": dict(),
-                "response": dict(),
+                "request": dict() as request_dict,
+                "response": dict() as response_dict,
             }:
-                request_spec = cast("_RequestSpec", mapping["request"])
-                response_spec = cast("_ResponseSpec", mapping["response"])
+                request_spec: _RequestSpec = request_dict
+                response_spec: _ResponseSpec = response_dict
             case _:
                 continue
 
@@ -175,7 +174,7 @@ def add_wiremock_to_respx(
         query_params: dict[str, object] | None
         match query_params_raw:
             case dict():
-                query_params = cast("dict[str, object]", query_params_raw)
+                query_params = query_params_raw
             case _:
                 query_params = None
 
