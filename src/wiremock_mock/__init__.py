@@ -55,7 +55,7 @@ def _build_path_pattern(
         for param_name, param_matcher in query_params.items():
             if not isinstance(param_matcher, dict):
                 continue
-            eq_matcher = cast("_QueryParamMatcher", param_matcher)  # noqa: TID251
+            eq_matcher = cast("_QueryParamMatcher", param_matcher)
             match eq_matcher:
                 case {"equalTo": eq_val} if eq_val is not None:
                     value = re.escape(pattern=str(object=eq_val))
@@ -84,7 +84,7 @@ def _build_response(
 
     headers_raw = response_spec.get("headers")
     headers: dict[str, str] = (
-        cast("dict[str, str]", headers_raw)  # noqa: TID251
+        cast("dict[str, str]", headers_raw)
         if isinstance(headers_raw, dict)
         else {}
     )
@@ -148,19 +148,19 @@ def add_wiremock_to_respx(
     raw: object = stubs.get("mappings") or []
     if not isinstance(raw, list):
         return
-    mappings = cast("list[object]", raw)  # noqa: TID251
+    mappings = cast("list[object]", raw)
 
     for item in mappings:
         if not isinstance(item, dict):
             continue
-        mapping = cast("dict[str, object]", item)  # noqa: TID251
+        mapping = cast("dict[str, object]", item)
         match mapping:
             case {
                 "request": dict(),
                 "response": dict(),
             }:
-                request_spec = cast("_RequestSpec", mapping["request"])  # noqa: TID251
-                response_spec = cast("_ResponseSpec", mapping["response"])  # noqa: TID251
+                request_spec = cast("_RequestSpec", mapping["request"])
+                response_spec = cast("_ResponseSpec", mapping["response"])
             case _:
                 continue
 
@@ -175,7 +175,7 @@ def add_wiremock_to_respx(
         query_params: dict[str, object] | None
         match query_params_raw:
             case dict():
-                query_params = cast("dict[str, object]", query_params_raw)  # noqa: TID251
+                query_params = cast("dict[str, object]", query_params_raw)
             case _:
                 query_params = None
 
