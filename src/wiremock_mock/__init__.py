@@ -1,7 +1,7 @@
 """Package for serving WireMock stubs as a mock with respx."""
 
 import re
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict, cast  # noqa: TID251
 
 import httpx
 import respx
