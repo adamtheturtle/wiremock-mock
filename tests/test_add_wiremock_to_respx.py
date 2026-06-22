@@ -476,6 +476,26 @@ def test_add_wiremock_to_respx_body_equal_to_json_not_json_body() -> None:
             httpx.post(url=f"{BASE_URL}/v1/pages", content=b"not json")
 
 
+def test_add_wiremock_to_respx_body_equal_to_json_non_utf8() -> None:
+    """A non-UTF-8 request body does not match ``equalToJson``."""
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {
+                    "method": "POST",
+                    "urlPath": "/v1/pages",
+                    "bodyPatterns": [{"equalToJson": {"a": 1}}],
+                },
+                "response": {"status": 200, "jsonBody": {"ok": True}},
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        with pytest.raises(expected_exception=AssertionError):
+            httpx.post(url=f"{BASE_URL}/v1/pages", content=b"\xff\xfe")
+
+
 def test_add_wiremock_to_respx_body_ignore_extra_elements() -> None:
     """``ignoreExtraElements`` matches a subset of object keys."""
     stubs: dict[str, Any] = {

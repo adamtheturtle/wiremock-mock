@@ -221,8 +221,11 @@ def _equal_to_json_predicate(
         """Return whether the request body matches ``expected`` as
         JSON.
         """
+        text = _request_text(request=request)
+        if text is None:
+            return False
         try:
-            actual = json.loads(s=request.read())
+            actual = json.loads(s=text)
         except json.JSONDecodeError:
             return False
         return _json_values_match(
@@ -404,12 +407,12 @@ def add_wiremock_to_respx(
     - method
     - ``urlPath`` (exact) or ``urlPathPattern`` (regex)
     - ``queryParameters`` with ``equalTo``
-    - ``bodyPatterns`` with ``equalToJson`` (honouring ``ignoreArrayOrder``
-      and ``ignoreExtraElements``), ``contains`` and ``equalTo``
+    - ``bodyPatterns`` (``equalToJson``, ``contains``, ``equalTo``)
 
-    Multiple ``bodyPatterns`` on a single stub must all match. This lets two
-    requests to the same method and URL return different responses based on
-    their bodies.
+    ``equalToJson`` honours the ``ignoreArrayOrder`` and
+    ``ignoreExtraElements`` options. Multiple ``bodyPatterns`` on a single
+    stub must all match, letting two requests to the same method and URL
+    return different responses based on their bodies.
 
     Response uses status, headers, and ``jsonBody`` from each stub.
 
