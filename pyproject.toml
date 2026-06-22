@@ -309,6 +309,7 @@ ignore_names = [
     "base_url",
     # TypedDict fields accessed via string keys (not attribute access)
     "body",
+    "bodyPatterns",
     "copybutton_exclude",
     "equalTo",
     "extensions",
@@ -327,6 +328,8 @@ ignore_names = [
     "linkcheck_ignore",
     "linkcheck_retries",
     "master_doc",
+    # respx ``Pattern.match`` is invoked dynamically by respx
+    "match",
     "nitpicky",
     "project_copyright",
     "pygments_style",

@@ -76,6 +76,10 @@ Supported stub features
 
 - **Request matching**: ``method``, ``urlPath`` (exact), ``urlPathPattern`` (regex)
 - **Query parameters**: ``queryParameters`` with ``equalTo``
+- **Request body**: ``bodyPatterns`` with ``equalToJson`` (honouring
+  ``ignoreArrayOrder`` and ``ignoreExtraElements``), ``contains`` and
+  ``equalTo``. This lets two requests to the same method and URL return
+  different responses based on their bodies.
 - **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
 
 Full documentation

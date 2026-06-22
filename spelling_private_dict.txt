@@ -2,8 +2,17 @@ Changelog
 JSON
 Pytest
 beartype
+honouring
 httpx
 macOS
+matcher
+matchers
+multisets
 params
+positionally
 respx
+str
+subsequence
+substring
+unhandled
 wiremock
