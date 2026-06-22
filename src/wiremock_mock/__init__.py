@@ -409,7 +409,7 @@ def add_wiremock_to_respx(
     - ``queryParameters`` with ``equalTo``
     - ``bodyPatterns`` (``equalToJson``, ``contains``, ``equalTo``)
 
-    ``equalToJson`` honours the ``ignoreArrayOrder`` and
+    ``equalToJson`` supports the ``ignoreArrayOrder`` and
     ``ignoreExtraElements`` options. Multiple ``bodyPatterns`` on a single
     stub must all match, letting two requests to the same method and URL
     return different responses based on their bodies.
