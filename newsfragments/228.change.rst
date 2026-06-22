@@ -1,1 +1,0 @@
-Added support for matching requests on their body with WireMock ``bodyPatterns``: ``equalToJson`` (honouring ``ignoreArrayOrder`` and ``ignoreExtraElements``), ``contains`` and ``equalTo``.
