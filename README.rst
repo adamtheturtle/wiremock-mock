@@ -80,7 +80,8 @@ Supported stub features
   ``ignoreArrayOrder`` and ``ignoreExtraElements``), ``contains`` and
   ``equalTo``. This lets two requests to the same method and URL return
   different responses based on their bodies.
-- **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
+- **Response**: ``status``, ``statusMessage``, single- or multi-value
+  ``headers``, ``jsonBody``, ``body``, ``base64Body``
 
 Full documentation
 ------------------

@@ -65,7 +65,8 @@ Supported stub features
 
 - **Request matching**: ``method``, ``urlPath`` (exact), ``urlPathPattern`` (regex)
 - **Query parameters**: ``queryParameters`` with ``equalTo``
-- **Response**: ``status``, ``headers``, ``jsonBody``, ``body``
+- **Response**: ``status``, ``statusMessage``, single- or multi-value
+  ``headers``, ``jsonBody``, ``body``, ``base64Body``
 
 Reference
 ---------
