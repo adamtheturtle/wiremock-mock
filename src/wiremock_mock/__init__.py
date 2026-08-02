@@ -1,12 +1,15 @@
-"""Package for serving WireMock stubs as a mock with respx."""
+"""Package for serving WireMock stubs with Python HTTP mocking
+libraries.
+"""
 
 import base64
 import json
 import re
 from collections.abc import Callable
-from typing import Any, TypedDict, cast  # noqa: TID251
+from typing import Any, NamedTuple, Protocol, TypedDict, cast  # noqa: TID251
 
 import httpx
+import responses
 import respx
 from beartype import beartype
 from respx.patterns import Match, Pattern
@@ -37,6 +40,37 @@ class _ResponseSpec(TypedDict, total=False):
     jsonBody: object
     body: object
     base64Body: object
+
+
+class _RequestWithBody(Protocol):
+    """The part of a prepared HTTP request used by body matchers."""
+
+    body: object
+
+
+class _BodyMatcher(NamedTuple):
+    """A backend-neutral request-body matcher."""
+
+    identity: str
+    predicate: Callable[[bytes | None], bool]
+
+
+class _ParsedResponse(NamedTuple):
+    """A backend-neutral WireMock response."""
+
+    status: int
+    headers: list[tuple[str, str]]
+    body: bytes
+    status_message: str | None
+
+
+class _ParsedMapping(NamedTuple):
+    """A backend-neutral WireMock mapping."""
+
+    method: str
+    url_pattern: re.Pattern[str]
+    body_matchers: list[_BodyMatcher]
+    response: _ParsedResponse
 
 
 def _coerce_json(*, value: object) -> object:
@@ -177,10 +211,12 @@ def _json_arrays_match_ordered(
     return True
 
 
-def _request_text(*, request: httpx.Request) -> str | None:
-    """Return the request body as text, or ``None`` if it is not text."""
+def _request_text(*, content: bytes | None) -> str | None:
+    """Return request content as text, or ``None`` if it is not text."""
+    if content is None:
+        return None
     try:
-        return request.read().decode()
+        return content.decode()
     except UnicodeDecodeError:
         return None
 
@@ -188,12 +224,12 @@ def _request_text(*, request: httpx.Request) -> str | None:
 def _equal_to_predicate(
     *,
     expected: str,
-) -> Callable[[httpx.Request], bool]:
+) -> Callable[[bytes | None], bool]:
     """Build a predicate matching the raw request body exactly."""
 
-    def predicate(request: httpx.Request) -> bool:
+    def predicate(content: bytes | None) -> bool:
         """Return whether the request body equals ``expected``."""
-        return _request_text(request=request) == expected
+        return _request_text(content=content) == expected
 
     return predicate
 
@@ -201,12 +237,12 @@ def _equal_to_predicate(
 def _contains_predicate(
     *,
     substring: str,
-) -> Callable[[httpx.Request], bool]:
+) -> Callable[[bytes | None], bool]:
     """Build a predicate matching a substring of the raw request body."""
 
-    def predicate(request: httpx.Request) -> bool:
+    def predicate(content: bytes | None) -> bool:
         """Return whether the request body contains ``substring``."""
-        text = _request_text(request=request)
+        text = _request_text(content=content)
         return text is not None and substring in text
 
     return predicate
@@ -217,14 +253,14 @@ def _equal_to_json_predicate(
     expected: object,
     ignore_array_order: bool,
     ignore_extra_elements: bool,
-) -> Callable[[httpx.Request], bool]:
+) -> Callable[[bytes | None], bool]:
     """Build a predicate matching the request body as JSON."""
 
-    def predicate(request: httpx.Request) -> bool:
+    def predicate(content: bytes | None) -> bool:
         """Return whether the request body matches ``expected`` as
         JSON.
         """
-        text = _request_text(request=request)
+        text = _request_text(content=content)
         if text is None:
             return False
         try:
@@ -250,7 +286,7 @@ class _BodyPattern(Pattern):
         self,
         *,
         identity: str,
-        predicate: Callable[[httpx.Request], bool],
+        predicate: Callable[[bytes | None], bool],
     ) -> None:
         """
         :param identity: A stable string identifying this matcher, used
@@ -263,11 +299,11 @@ class _BodyPattern(Pattern):
 
     def match(self, request: httpx.Request) -> Match:
         """Return whether ``request`` matches this body pattern."""
-        return Match(matches=self._predicate(request))
+        return Match(matches=self._predicate(request.read()))
 
 
-def _build_body_pattern(*, matcher: dict[str, object]) -> _BodyPattern | None:
-    """Build a body pattern from a single WireMock body matcher."""
+def _build_body_matcher(*, matcher: dict[str, object]) -> _BodyMatcher | None:
+    """Build a backend-neutral WireMock request-body matcher."""
     identity = json.dumps(obj=matcher, sort_keys=True, default=str)
     ignore_array_order = matcher.get("ignoreArrayOrder") is True
     ignore_extra_elements = matcher.get("ignoreExtraElements") is True
@@ -286,18 +322,18 @@ def _build_body_pattern(*, matcher: dict[str, object]) -> _BodyPattern | None:
         case _:
             return None
 
-    return _BodyPattern(identity=identity, predicate=predicate)
+    return _BodyMatcher(identity=identity, predicate=predicate)
 
 
-def _build_body_patterns(*, body_patterns: object) -> list[_BodyPattern]:
-    """Build respx patterns from a WireMock ``bodyPatterns`` list."""
+def _build_body_matchers(*, body_patterns: object) -> list[_BodyMatcher]:
+    """Build matchers from a WireMock ``bodyPatterns`` list."""
     if not isinstance(body_patterns, list):
         return []
-    patterns: list[_BodyPattern] = []
+    patterns: list[_BodyMatcher] = []
     for matcher in cast("list[object]", body_patterns):
         if not isinstance(matcher, dict):
             continue
-        pattern = _build_body_pattern(
+        pattern = _build_body_matcher(
             matcher=cast("dict[str, object]", matcher)
         )
         if pattern is not None:
@@ -373,11 +409,21 @@ def _build_response_extensions(*, status_message: object) -> dict[str, object]:
     return {}
 
 
-def _build_response(
-    *,
-    response_spec: _ResponseSpec,
-) -> httpx.Response:
-    """Build an httpx Response from a WireMock response dict."""
+def _build_response(*, parsed: _ParsedResponse) -> httpx.Response:
+    """Build an httpx response from a parsed WireMock response."""
+    extensions = _build_response_extensions(
+        status_message=parsed.status_message
+    )
+    return httpx.Response(
+        status_code=parsed.status,
+        headers=parsed.headers,
+        content=parsed.body,
+        extensions=extensions,
+    )
+
+
+def _parse_response(*, response_spec: _ResponseSpec) -> _ParsedResponse:
+    """Parse a backend-neutral response from a WireMock response dict."""
     match response_spec.get("status"):
         case int() as status:
             pass
@@ -385,93 +431,65 @@ def _build_response(
             status = 200
 
     headers = _build_response_headers(headers_raw=response_spec.get("headers"))
-    extensions = _build_response_extensions(
-        status_message=response_spec.get("statusMessage")
+    status_message_raw = response_spec.get("statusMessage")
+    status_message = (
+        status_message_raw if isinstance(status_message_raw, str) else None
     )
 
     json_body = response_spec.get("jsonBody")
     if json_body is not None:
-        return httpx.Response(
-            status_code=status,
+        body = json.dumps(
+            obj=json_body,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode()
+        if not any(name.lower() == "content-type" for name, _ in headers):
+            headers.append(("Content-Type", "application/json"))
+        return _ParsedResponse(
+            status=status,
             headers=headers,
-            json=json_body,
-            extensions=extensions,
+            body=body,
+            status_message=status_message,
         )
 
     match response_spec.get("base64Body"):
         case str() as base64_body:
-            return httpx.Response(
-                status_code=status,
+            return _ParsedResponse(
+                status=status,
                 headers=headers,
-                content=base64.b64decode(s=base64_body, validate=True),
-                extensions=extensions,
+                body=base64.b64decode(s=base64_body, validate=True),
+                status_message=status_message,
             )
         case _:
             pass
 
     match response_spec.get("body"):
         case bytes() as b:
-            return httpx.Response(
-                status_code=status,
-                headers=headers,
-                content=b,
-                extensions=extensions,
-            )
+            body = b
         case str() as s:
-            return httpx.Response(
-                status_code=status,
-                headers=headers,
-                content=s.encode(),
-                extensions=extensions,
-            )
+            body = s.encode()
         case None:
-            return httpx.Response(
-                status_code=status,
-                headers=headers,
-                extensions=extensions,
-            )
+            body = b""
         case other:
-            return httpx.Response(
-                status_code=status,
-                headers=headers,
-                content=str(object=other).encode(),
-                extensions=extensions,
-            )
+            body = str(object=other).encode()
+    return _ParsedResponse(
+        status=status,
+        headers=headers,
+        body=body,
+        status_message=status_message,
+    )
 
 
-@beartype
-def add_wiremock_to_respx(
-    *,
-    mock_obj: respx.MockRouter | respx.Router,
-    stubs: dict[str, Any],
-    base_url: str,
-) -> None:
-    """
-    Add mock routes from WireMock stubs to a respx mock/router.
-
-    Supports request matching by:
-    - method
-    - ``urlPath`` (exact) or ``urlPathPattern`` (regex)
-    - ``queryParameters`` with ``equalTo``
-    - ``bodyPatterns`` (``equalToJson``, ``contains``, ``equalTo``)
-
-    ``equalToJson`` supports the ``ignoreArrayOrder`` and
-    ``ignoreExtraElements`` options. Multiple ``bodyPatterns`` on a single
-    stub must all match, letting two requests to the same method and URL
-    return different responses based on their bodies.
-
-    Response supports ``status``, ``statusMessage``, ``headers``,
-    ``jsonBody``, ``body`` and ``base64Body`` from each stub.
-
-    :param mock_obj: The respx MockRouter or Router to add routes to.
-    :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
-        ``json.loads(path.read_text())``).
-    :param base_url: Base URL for all routes. Must match ``respx.mock()``.
-    """
+def _parse_mappings(
+    *, stubs: dict[str, Any], base_url: str
+) -> list[_ParsedMapping]:
+    """Parse valid mappings into a representation shared by backends."""
     raw: object = stubs.get("mappings") or []
     if not isinstance(raw, list):
-        return
+        return []
     mappings = cast("list[object]", raw)
+    parsed_mappings: list[_ParsedMapping] = []
 
     for item in mappings:
         if not isinstance(item, dict):
@@ -511,22 +529,146 @@ def add_wiremock_to_respx(
             if url_path_pattern is not None
             else None
         )
-
-        response = _build_response(response_spec=response_spec)
-
-        url_pattern = _build_path_pattern(
-            base_url=base_url,
-            path=path,
-            path_pattern=path_pattern,
-            query_params=query_params,
+        parsed_mappings.append(
+            _ParsedMapping(
+                method=method,
+                url_pattern=_build_path_pattern(
+                    base_url=base_url,
+                    path=path,
+                    path_pattern=path_pattern,
+                    query_params=query_params,
+                ),
+                body_matchers=_build_body_matchers(
+                    body_patterns=request_spec.get("bodyPatterns"),
+                ),
+                response=_parse_response(response_spec=response_spec),
+            )
         )
+    return parsed_mappings
 
-        body_patterns = _build_body_patterns(
-            body_patterns=request_spec.get("bodyPatterns"),
+
+def _responses_request_content(*, body: object) -> bytes | None:
+    """Convert a requests body into content accepted by our matchers."""
+    match body:
+        case bytes() as content:
+            return content
+        case str() as content:
+            return content.encode()
+        case None:
+            return b""
+        case _:
+            return None
+
+
+def _build_responses_matcher(
+    *, body_matcher: _BodyMatcher
+) -> Callable[[_RequestWithBody], tuple[bool, str]]:
+    """Adapt a backend-neutral body matcher for responses."""
+
+    def matcher(request: _RequestWithBody) -> tuple[bool, str]:
+        """Return whether a requests request body matches."""
+        matches = body_matcher.predicate(
+            _responses_request_content(body=request.body)
         )
+        reason = (
+            f"WireMock body pattern did not match: {body_matcher.identity}"
+        )
+        return matches, reason
 
-        route = mock_obj.route(*body_patterns, method=method, url=url_pattern)
-        route.mock(return_value=response)
+    return matcher
 
 
-__all__ = ["add_wiremock_to_respx"]
+def _build_responses_callback(
+    *, parsed: _ParsedResponse
+) -> Callable[[object], tuple[int, list[tuple[str, str]], bytes]]:
+    """Build a responses callback returning a parsed WireMock response."""
+
+    def callback(
+        _request: object,
+    ) -> tuple[int, list[tuple[str, str]], bytes]:
+        """Return the configured status, headers and body."""
+        return parsed.status, parsed.headers, parsed.body
+
+    return callback
+
+
+@beartype
+def add_wiremock_to_respx(
+    *,
+    mock_obj: respx.MockRouter | respx.Router,
+    stubs: dict[str, Any],
+    base_url: str,
+) -> None:
+    """
+    Add mock routes from WireMock stubs to a respx mock/router.
+
+    Supports request matching by:
+    - method
+    - ``urlPath`` (exact) or ``urlPathPattern`` (regex)
+    - ``queryParameters`` with ``equalTo``
+    - ``bodyPatterns`` (``equalToJson``, ``contains``, ``equalTo``)
+
+    ``equalToJson`` supports the ``ignoreArrayOrder`` and
+    ``ignoreExtraElements`` options. Multiple ``bodyPatterns`` on a single
+    stub must all match, letting two requests to the same method and URL
+    return different responses based on their bodies.
+
+    Response supports ``status``, ``statusMessage``, ``headers``,
+    ``jsonBody``, ``body`` and ``base64Body`` from each stub.
+
+    :param mock_obj: The respx MockRouter or Router to add routes to.
+    :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
+        ``json.loads(path.read_text())``).
+    :param base_url: Base URL for all routes. Must match ``respx.mock()``.
+    """
+    for mapping in _parse_mappings(stubs=stubs, base_url=base_url):
+        body_patterns = [
+            _BodyPattern(
+                identity=matcher.identity,
+                predicate=matcher.predicate,
+            )
+            for matcher in mapping.body_matchers
+        ]
+        route = mock_obj.route(
+            *body_patterns,
+            method=mapping.method,
+            url=mapping.url_pattern,
+        )
+        route.mock(return_value=_build_response(parsed=mapping.response))
+
+
+@beartype
+def add_wiremock_to_responses(
+    *,
+    mock_obj: responses.RequestsMock,
+    stubs: dict[str, Any],
+    base_url: str,
+) -> None:
+    """
+    Add mock routes from WireMock stubs to a responses mock.
+
+    Request matching and response fields are the same as for
+    :func:`add_wiremock_to_respx`, except that custom ``statusMessage`` values
+    are not supported by responses.
+
+    :param mock_obj: The responses RequestsMock to add routes to.
+    :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
+        ``json.loads(path.read_text())``).
+    :param base_url: Base URL for all routes.
+    """
+    for mapping in _parse_mappings(stubs=stubs, base_url=base_url):
+        matchers = tuple(
+            _build_responses_matcher(body_matcher=body_matcher)
+            for body_matcher in mapping.body_matchers
+        )
+        response = responses.CallbackResponse(
+            method=mapping.method,
+            url=mapping.url_pattern,
+            callback=_build_responses_callback(parsed=mapping.response),
+            content_type=None,
+            match=matchers,
+        )
+        mock_obj.add(response)
+
+
+__all__ = ["add_wiremock_to_responses", "add_wiremock_to_respx"]
