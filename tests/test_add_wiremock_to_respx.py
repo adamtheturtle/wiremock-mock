@@ -217,6 +217,59 @@ def test_add_wiremock_to_respx_body_bytes_response() -> None:
         assert response.content == b"binary data"
 
 
+def test_add_wiremock_to_respx_base64_body_response() -> None:
+    """Add_wiremock_to_respx decodes a WireMock ``base64Body``."""
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {"method": "GET", "urlPath": "/v1/bin"},
+                "response": {
+                    "status": 200,
+                    "base64Body": "YmluYXJ5AGRhdGE=",
+                },
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        response = httpx.get(url=f"{BASE_URL}/v1/bin")
+        assert response.content == b"binary\x00data"
+
+
+def test_add_wiremock_to_respx_response_metadata() -> None:
+    """Status messages and single or repeated headers are returned."""
+    stubs: dict[str, Any] = {
+        "mappings": [
+            {
+                "request": {"method": "GET", "urlPath": "/v1/created"},
+                "response": {
+                    "status": 201,
+                    "statusMessage": "Created for test",
+                    "headers": {
+                        "X-Single": "one",
+                        "Set-Cookie": ["first=1", "second=2"],
+                        "X-Partly-Valid": ["included", 3],
+                        "X-Invalid": 4,
+                        5: "invalid-name",
+                    },
+                },
+            },
+        ],
+    }
+    with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
+        add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
+        response = httpx.get(url=f"{BASE_URL}/v1/created")
+        assert response.status_code == HTTPStatus.CREATED
+        assert response.reason_phrase == "Created for test"
+        assert response.headers["X-Single"] == "one"
+        assert response.headers.get_list(key="Set-Cookie") == [
+            "first=1",
+            "second=2",
+        ]
+        assert response.headers.get_list(key="X-Partly-Valid") == ["included"]
+        assert "X-Invalid" not in response.headers
+
+
 def test_add_wiremock_to_respx_body_non_string_response() -> None:
     """Add_wiremock_to_respx converts non-str/bytes body via str()."""
     stubs: dict[str, Any] = {
@@ -941,7 +994,9 @@ def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
                 "request": {"method": "GET", "urlPath": "/v1/edge"},
                 "response": {
                     "status": "invalid",
+                    "statusMessage": 1,
                     "headers": "not-a-dict",
+                    "base64Body": 2,
                     "jsonBody": {"ok": True},
                 },
             },

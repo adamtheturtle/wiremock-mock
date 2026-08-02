@@ -309,6 +309,7 @@ ignore_names = [
     "autoclass_content",
     "autodoc_member_order",
     "base_url",
+    "base64Body",
     # TypedDict fields accessed via string keys (not attribute access)
     "body",
     "bodyPatterns",
@@ -343,6 +344,7 @@ ignore_names = [
     "rst_prolog",
     "source_suffix",
     "spelling_word_list_filename",
+    "statusMessage",
     "templates_path",
     "towncrier_draft_autoversion_mode",
     "towncrier_draft_include_empty",

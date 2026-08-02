@@ -1,5 +1,6 @@
 """Package for serving WireMock stubs as a mock with respx."""
 
+import base64
 import json
 import re
 from collections.abc import Callable
@@ -31,9 +32,11 @@ class _ResponseSpec(TypedDict, total=False):
     """A WireMock response specification."""
 
     status: object
+    statusMessage: object
     headers: object
     jsonBody: object
     body: object
+    base64Body: object
 
 
 def _coerce_json(*, value: object) -> object:
@@ -341,6 +344,35 @@ def _build_path_pattern(
     return re.compile(pattern=full_pattern)
 
 
+def _build_response_headers(*, headers_raw: object) -> list[tuple[str, str]]:
+    """Build HTTPX headers from a WireMock response header mapping."""
+    headers: list[tuple[str, str]] = []
+    if not isinstance(headers_raw, dict):
+        return headers
+    for name, value in cast("dict[object, object]", headers_raw).items():
+        if not isinstance(name, str):
+            continue
+        match value:
+            case str() as header_value:
+                headers.append((name, header_value))
+            case list():
+                headers.extend(
+                    (name, header_value)
+                    for header_value in cast("list[object]", value)
+                    if isinstance(header_value, str)
+                )
+            case _:
+                pass
+    return headers
+
+
+def _build_response_extensions(*, status_message: object) -> dict[str, object]:
+    """Build HTTPX extensions for WireMock response metadata."""
+    if isinstance(status_message, str):
+        return {"reason_phrase": status_message.encode()}
+    return {}
+
+
 def _build_response(
     *,
     response_spec: _ResponseSpec,
@@ -352,11 +384,9 @@ def _build_response(
         case _:
             status = 200
 
-    headers_raw = response_spec.get("headers")
-    headers: dict[str, str] = (
-        cast("dict[str, str]", headers_raw)
-        if isinstance(headers_raw, dict)
-        else {}
+    headers = _build_response_headers(headers_raw=response_spec.get("headers"))
+    extensions = _build_response_extensions(
+        status_message=response_spec.get("statusMessage")
     )
 
     json_body = response_spec.get("jsonBody")
@@ -365,7 +395,19 @@ def _build_response(
             status_code=status,
             headers=headers,
             json=json_body,
+            extensions=extensions,
         )
+
+    match response_spec.get("base64Body"):
+        case str() as base64_body:
+            return httpx.Response(
+                status_code=status,
+                headers=headers,
+                content=base64.b64decode(s=base64_body, validate=True),
+                extensions=extensions,
+            )
+        case _:
+            pass
 
     match response_spec.get("body"):
         case bytes() as b:
@@ -373,23 +415,27 @@ def _build_response(
                 status_code=status,
                 headers=headers,
                 content=b,
+                extensions=extensions,
             )
         case str() as s:
             return httpx.Response(
                 status_code=status,
                 headers=headers,
                 content=s.encode(),
+                extensions=extensions,
             )
         case None:
             return httpx.Response(
                 status_code=status,
                 headers=headers,
+                extensions=extensions,
             )
         case other:
             return httpx.Response(
                 status_code=status,
                 headers=headers,
                 content=str(object=other).encode(),
+                extensions=extensions,
             )
 
 
@@ -414,7 +460,8 @@ def add_wiremock_to_respx(
     stub must all match, letting two requests to the same method and URL
     return different responses based on their bodies.
 
-    Response uses status, headers, and ``jsonBody`` from each stub.
+    Response supports ``status``, ``statusMessage``, ``headers``,
+    ``jsonBody``, ``body`` and ``base64Body`` from each stub.
 
     :param mock_obj: The respx MockRouter or Router to add routes to.
     :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
