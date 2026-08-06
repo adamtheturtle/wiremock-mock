@@ -63,3 +63,6 @@ dmypy.json
 # Cursor
 .cursorignore
 .cursorindexingignore
+
+# Vale styles downloaded by ``vale sync``
+styles/
