@@ -1,2 +1,0 @@
-Add support for Base64-encoded response bodies, custom status messages and
-multi-value response headers in WireMock stubs.

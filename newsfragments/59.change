@@ -1,2 +1,0 @@
-Add a public ``add_wiremock_to_responses`` integration for using WireMock
-stubs with requests clients mocked by responses.
