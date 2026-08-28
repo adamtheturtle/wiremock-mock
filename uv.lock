@@ -1896,15 +1896,15 @@ wheels = [
 
 [[package]]
 name = "strict-kwargs"
-version = "2026.8.16"
+version = "2026.8.27.post2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ty" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/0e/e925e408b94e702fae72a79fb073f04c1aa1b15f324cf4da1b506b639555/strict_kwargs-2026.8.16-py3-none-macosx_11_0_arm64.whl", hash = "sha256:96275b4c9a8e9a82c0506cf57839d123ccb660b8f1fa864bc7c04b33361ee50f", size = 3040170, upload-time = "2026-08-16T09:42:31.675Z" },
-    { url = "https://files.pythonhosted.org/packages/69/45/66aa3e9e2c036a3411c078ab131f3e097ba864d2f71835c295387728d3d3/strict_kwargs-2026.8.16-py3-none-manylinux_2_39_x86_64.whl", hash = "sha256:bd16cdde87a09874ec8daae654b8ab5fe20a0a65a7e62a67277ffbcc82a1cf84", size = 3236278, upload-time = "2026-08-16T09:42:33.681Z" },
-    { url = "https://files.pythonhosted.org/packages/33/48/dba6f677e89fc85de3f1fa603c5d101aba2e69e254e55199771ae93a263c/strict_kwargs-2026.8.16-py3-none-win_amd64.whl", hash = "sha256:42d2ae37cb8925b85f4ad29452bfe3e4eeb7778fba2b2604c5ae1aa77c9c2a34", size = 2938297, upload-time = "2026-08-16T09:42:35.369Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/21/f57647d4a6c700001201793fac0ea88d12caead7da7dbe6485b95b5fe552/strict_kwargs-2026.8.27.post2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:6278b789277d7687e4a9f9c6b4931e35ce6050d3cbedb0cd05e081d812642b3b", size = 3249037, upload-time = "2026-08-27T21:25:04.139Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/cb/2d4f54b74cc5e61d562e78df7cad83241d17b0b0ee807c10de197e2bb51b/strict_kwargs-2026.8.27.post2-py3-none-manylinux_2_39_x86_64.whl", hash = "sha256:8380656f34b4c8bb9f74b20d59de94b695bfa540c2697ebc25323f94058f5699", size = 3447804, upload-time = "2026-08-27T21:25:06.553Z" },
+    { url = "https://files.pythonhosted.org/packages/32/ab/c6e76f6384de945c4d7922b3da4486a1e35029f74dcb627221efb715fa02/strict_kwargs-2026.8.27.post2-py3-none-win_amd64.whl", hash = "sha256:eb6d9a72f2f551312f4978e03ba26ae2c34e307686f2559ad2d2b88c0c483e49", size = 3147657, upload-time = "2026-08-27T21:25:08.64Z" },
 ]
 
 [[package]]
@@ -2235,7 +2235,7 @@ requires-dist = [
     { name = "sphinx-substitution-extensions", marker = "extra == 'dev'", specifier = "==2026.8.13.1" },
     { name = "sphinxcontrib-spelling", marker = "extra == 'dev'", specifier = "==8.0.2" },
     { name = "sphinxcontrib-towncrier", marker = "extra == 'dev'", specifier = "==0.5.0a0" },
-    { name = "strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.8.16" },
+    { name = "strict-kwargs", marker = "extra == 'dev'", specifier = "==2026.8.27.post2" },
     { name = "sybil", extras = ["pytest"], marker = "extra == 'dev'", specifier = "==10.1.0" },
     { name = "towncrier", marker = "extra == 'dev'", specifier = "==25.8.0" },
     { name = "towncrier", marker = "extra == 'release'", specifier = "==25.8.0" },
