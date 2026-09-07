@@ -4,6 +4,11 @@ Changelog
 
 .. towncrier release notes start
 
+2026.09.07
+----------
+
+- Add a native HTTPX2 mock transport for loading WireMock mappings.
+
 2026.08.16
 ----------
 
