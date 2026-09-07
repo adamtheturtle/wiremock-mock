@@ -6,7 +6,14 @@ import base64
 import json
 import re
 from collections.abc import Callable
-from typing import Any, NamedTuple, Protocol, TypedDict, cast  # noqa: TID251
+from typing import (
+    Any,
+    NamedTuple,
+    Protocol,
+    TypedDict,
+    cast,  # noqa: TID251
+    override,
+)
 
 import httpx
 import httpx2
@@ -298,6 +305,7 @@ class _BodyPattern(Pattern):
         super().__init__(value=identity)
         self._predicate = predicate
 
+    @override
     def match(self, request: httpx.Request) -> Match:
         """Return whether ``request`` matches this body pattern."""
         return Match(matches=self._predicate(request.read()))
