@@ -4,10 +4,11 @@ requires = [ "setuptools", "setuptools-scm>=10.2.1" ]
 
 [project]
 name = "wiremock-mock"
-description = "Serve WireMock stubs with responses or respx."
+description = "Serve WireMock stubs with HTTPX2, responses or respx."
 readme = { file = "README.rst", content-type = "text/x-rst" }
 keywords = [
     "httpx",
+    "httpx2",
     "mock",
     "requests",
     "responses",
@@ -35,6 +36,7 @@ dynamic = [ "version" ]
 dependencies = [
     "beartype>=0.22.9",
     "httpx>=0.28.1",
+    "httpx2>=2.12.0",
     "responses>=0.26.2",
     "respx>=0.23.1",
 ]
@@ -324,6 +326,7 @@ ignore_names = [
     "body",
     "bodyPatterns",
     "copybutton_exclude",
+    "create_httpx2_transport",
     "equalTo",
     "extensions",
     # pytest fixtures - we name fixtures like this for this purpose

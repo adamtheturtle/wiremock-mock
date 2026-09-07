@@ -9,6 +9,7 @@ from collections.abc import Callable
 from typing import Any, NamedTuple, Protocol, TypedDict, cast  # noqa: TID251
 
 import httpx
+import httpx2
 import responses
 import respx
 from beartype import beartype
@@ -422,6 +423,22 @@ def _build_response(*, parsed: _ParsedResponse) -> httpx.Response:
     )
 
 
+def _build_httpx2_response(
+    *, parsed: _ParsedResponse, request: httpx2.Request
+) -> httpx2.Response:
+    """Build a native HTTPX2 response from a parsed WireMock response."""
+    extensions = _build_response_extensions(
+        status_message=parsed.status_message
+    )
+    return httpx2.Response(
+        status_code=parsed.status,
+        headers=parsed.headers,
+        content=parsed.body,
+        extensions=extensions,
+        request=request,
+    )
+
+
 def _parse_response(*, response_spec: _ResponseSpec) -> _ParsedResponse:
     """Parse a backend-neutral response from a WireMock response dict."""
     match response_spec.get("status"):
@@ -592,6 +609,61 @@ def _build_responses_callback(
     return callback
 
 
+def _httpx2_request_matches(
+    *, request: httpx2.Request, mapping: _ParsedMapping
+) -> bool:
+    """Return whether an HTTPX2 request matches a parsed mapping."""
+    return (
+        request.method == mapping.method
+        and mapping.url_pattern.fullmatch(string=str(object=request.url))
+        is not None
+        and all(
+            matcher.predicate(request.content)
+            for matcher in mapping.body_matchers
+        )
+    )
+
+
+def _build_httpx2_handler(
+    *, mappings: list[_ParsedMapping]
+) -> Callable[[httpx2.Request], httpx2.Response]:
+    """Build an HTTPX2 mock-transport handler for parsed mappings."""
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        """Return the response for the first matching WireMock mapping."""
+        for mapping in mappings:
+            if _httpx2_request_matches(request=request, mapping=mapping):
+                return _build_httpx2_response(
+                    parsed=mapping.response, request=request
+                )
+        message = f"No WireMock mapping matched {request.method} {request.url}"
+        raise httpx2.ConnectError(message=message, request=request)
+
+    return handler
+
+
+@beartype
+def create_httpx2_transport(
+    *, stubs: dict[str, Any], base_url: str
+) -> httpx2.MockTransport:
+    """Create a native HTTPX2 transport loaded with WireMock stubs.
+
+    Supports the same request matching and response fields as
+    :func:`add_wiremock_to_respx`. Requests that do not match a mapping raise
+    :class:`httpx2.ConnectError` rather than reaching the network.
+
+    :param stubs: WireMock stubs dict with ``mappings`` array (e.g. from
+        ``json.loads(path.read_text())``).
+    :param base_url: Base URL for all routes.
+    :return: A mock transport for ``httpx2.Client`` or
+        ``httpx2.AsyncClient``.
+    """
+    mappings = _parse_mappings(stubs=stubs, base_url=base_url)
+    return httpx2.MockTransport(
+        handler=_build_httpx2_handler(mappings=mappings)
+    )
+
+
 @beartype
 def add_wiremock_to_respx(
     *,
@@ -671,4 +743,8 @@ def add_wiremock_to_responses(
         mock_obj.add(response)
 
 
-__all__ = ["add_wiremock_to_responses", "add_wiremock_to_respx"]
+__all__ = [
+    "add_wiremock_to_responses",
+    "add_wiremock_to_respx",
+    "create_httpx2_transport",
+]
