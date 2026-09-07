@@ -4,7 +4,7 @@ requires = [ "setuptools", "setuptools-scm>=10.2.1" ]
 
 [project]
 name = "wiremock-mock"
-description = "Serve WireMock stubs with responses or respx."
+description = "Serve WireMock stubs with HTTPX2, responses or respx."
 readme = { file = "README.rst", content-type = "text/x-rst" }
 keywords = [
     "httpx",
