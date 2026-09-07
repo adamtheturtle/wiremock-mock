@@ -6,6 +6,7 @@ backends
 beartype
 honouring
 httpx
+httpx2
 integrations
 macOS
 matcher

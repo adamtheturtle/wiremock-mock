@@ -1,7 +1,7 @@
 |project|
 =========
 
-|project| serves WireMock stubs with `responses`_ or `respx`_.
+|project| serves WireMock stubs with HTTPX2, `responses`_ or `respx`_.
 
 Requires Python |minimum-python-version|\+.
 
@@ -86,10 +86,43 @@ httpx with respx
        response = httpx.get(url="http://notion-mock.test/v1/pages")
        assert response.status_code == HTTPStatus.OK
 
+HTTPX2 with a native mock transport
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   """Use WireMock stubs with HTTPX2."""
+
+   from http import HTTPStatus
+   from typing import Any
+
+   import httpx2
+
+   from wiremock_mock import create_httpx2_transport
+
+   stubs: dict[str, Any] = {
+       "mappings": [
+           {
+               "request": {"method": "GET", "urlPath": "/v1/pages"},
+               "response": {
+                   "status": 200,
+                   "jsonBody": {"object": "list", "results": []},
+               },
+           },
+       ],
+   }
+   transport = create_httpx2_transport(
+       stubs=stubs, base_url="http://notion-mock.test"
+   )
+   with httpx2.Client(transport=transport) as client:
+       response = client.get(url="http://notion-mock.test/v1/pages")
+   assert response.status_code == HTTPStatus.OK
+
 These integrations let you use existing WireMock stub files (e.g. from the
 WireMock Admin API import format) without running WireMock in Docker. HTTP
-traffic is mocked through responses for ``requests`` clients or respx for
-``httpx`` clients. To load stubs from a JSON file, use
+traffic is mocked through responses for ``requests`` clients, respx for
+``httpx`` clients, or a native mock transport for ``httpx2`` clients. To load
+stubs from a JSON file, use
 ``json.loads(path.read_text())``.
 
 Use cases
@@ -112,8 +145,8 @@ Supported stub features
 - **Response**: ``status``, ``statusMessage``, single- or multi-value
   ``headers``, ``jsonBody``, ``body``, ``base64Body``
 
-``statusMessage`` is supported by the respx integration; responses does not
-provide a custom reason-phrase hook.
+``statusMessage`` is supported by the respx and HTTPX2 integrations; responses
+does not provide a custom reason-phrase hook.
 
 Reference
 ---------
