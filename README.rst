@@ -62,8 +62,7 @@ requests with responses
        response = requests.get(url="http://notion-mock.test/v1/pages", timeout=1)
        assert response.status_code == HTTPStatus.OK  # noqa: S101
 
-The standard responses decorator workflow is also supported by passing
-``responses.mock`` while ``@responses.activate`` is active.
+The standard responses decorator workflow is also supported by passing ``responses.mock`` while ``@responses.activate`` is active.
 
 httpx with respx
 ~~~~~~~~~~~~~~~~
@@ -138,12 +137,9 @@ HTTPX2 with a native mock transport
        response = client.get(url="http://notion-mock.test/v1/pages")
    assert response.status_code == HTTPStatus.OK  # noqa: S101
 
-These integrations let you use existing WireMock stub files (e.g. from the
-WireMock Admin API import format) without running WireMock in Docker. HTTP
-traffic is mocked through responses for ``requests`` clients, respx for
-``httpx`` clients, or a native mock transport for ``httpx2`` clients. To load
-stubs from a JSON file, use
-``json.loads(path.read_text())``.
+These integrations let you use existing WireMock stub files (e.g. from the WireMock Admin API import format) without running WireMock in Docker.
+HTTP traffic is mocked through responses for ``requests`` clients, respx for ``httpx`` clients, or a native mock transport for ``httpx2`` clients.
+To load stubs from a JSON file, use ``json.loads(path.read_text())``.
 
 Use cases
 ---------
@@ -158,15 +154,12 @@ Supported stub features
 
 - **Request matching**: ``method``, ``urlPath`` (exact), ``urlPathPattern`` (regex)
 - **Query parameters**: ``queryParameters`` with ``equalTo``
-- **Request body**: ``bodyPatterns`` with ``equalToJson`` (honouring
-  ``ignoreArrayOrder`` and ``ignoreExtraElements``), ``contains`` and
-  ``equalTo``. This lets two requests to the same method and URL return
-  different responses based on their bodies.
-- **Response**: ``status``, ``statusMessage``, single- or multi-value
-  ``headers``, ``jsonBody``, ``body``, ``base64Body``
+- **Request body**: ``bodyPatterns`` with ``equalToJson`` (honouring ``ignoreArrayOrder`` and ``ignoreExtraElements``), ``contains`` and ``equalTo``.
+  This lets two requests to the same method and URL return different responses based on their bodies.
+- **Response**: ``status``, ``statusMessage``, single- or multi-value ``headers``, ``jsonBody``, ``body``, ``base64Body``
 
-``statusMessage`` is supported by the respx and HTTPX2 integrations; responses
-does not provide a custom reason-phrase hook.
+``statusMessage`` is supported by the respx and HTTPX2 integrations.
+Responses does not provide a custom reason-phrase hook.
 
 Full documentation
 ------------------
