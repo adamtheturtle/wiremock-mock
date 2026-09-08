@@ -2,8 +2,8 @@
 
 import asyncio
 import base64
+from collections.abc import Mapping
 from http import HTTPStatus
-from typing import Any
 
 import httpx2
 import pytest
@@ -13,14 +13,14 @@ from wiremock_mock import create_httpx2_transport
 BASE_URL = "http://wiremock.test"
 
 
-def _transport(*, stubs: dict[str, Any]) -> httpx2.MockTransport:
+def _transport(*, stubs: Mapping[str, object]) -> httpx2.MockTransport:
     """Create a transport for the test base URL."""
     return create_httpx2_transport(stubs=stubs, base_url=BASE_URL)
 
 
 def test_sync_client_uses_native_httpx2_objects() -> None:
     """The synchronous path uses HTTPX2 requests and responses."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/greeting"},
@@ -40,7 +40,7 @@ def test_sync_client_uses_native_httpx2_objects() -> None:
 
 def test_async_client_uses_transport() -> None:
     """The same transport supports the asynchronous HTTPX2 client."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/greeting"},
@@ -65,7 +65,7 @@ def test_async_client_uses_transport() -> None:
 def test_matches_url_query_body_and_builds_response_metadata() -> None:
     """The HTTPX2 backend supports shared request and response fields."""
     encoded_body = base64.b64encode(s=b"created").decode()
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -114,7 +114,7 @@ def test_unmatched_request_never_reaches_network(
     *, method: str, path: str, content: bytes
 ) -> None:
     """Method, URL, and body mismatches raise instead of using the network."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -135,7 +135,9 @@ def test_unmatched_request_never_reaches_network(
             match="No WireMock mapping matched",
         ),
     ):
-        client.request(method=method, url=f"{BASE_URL}{path}", content=content)
+        _ = client.request(
+            method=method, url=f"{BASE_URL}{path}", content=content
+        )
 
 
 def test_empty_mappings_never_reach_network() -> None:
@@ -147,4 +149,4 @@ def test_empty_mappings_never_reach_network() -> None:
             match="No WireMock mapping matched",
         ),
     ):
-        client.get(url=f"{BASE_URL}/missing")
+        _ = client.get(url=f"{BASE_URL}/missing")

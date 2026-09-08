@@ -5,9 +5,9 @@ libraries.
 import base64
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from contextlib import suppress
 from typing import (
-    Any,
     NamedTuple,
     Protocol,
     TypedDict,
@@ -89,10 +89,11 @@ def _coerce_json(*, value: object) -> object:
     containing JSON. Strings that are not valid JSON are returned unchanged.
     """
     if isinstance(value, str):
-        try:
-            return json.loads(s=value)
-        except json.JSONDecodeError:
-            return value
+        loaded: object = value
+        with suppress(json.JSONDecodeError):
+            parsed: object = json.loads(s=value)
+            loaded = parsed
+        return loaded
     return value
 
 
@@ -368,7 +369,7 @@ def _build_path_pattern(
 
     full_pattern = f"^{re.escape(pattern=base)}{path_re}"
 
-    if query_params:
+    if query_params is not None and len(query_params) > 0:
         lookaheads: list[str] = []
         for param_name, param_matcher in query_params.items():
             if not isinstance(param_matcher, dict):
@@ -382,7 +383,7 @@ def _build_path_pattern(
                     )
                 case _:
                     pass
-        if lookaheads:
+        if len(lookaheads) > 0:
             full_pattern += r"\?" + "".join(lookaheads) + r".*"
 
     full_pattern += r"(\?.*)?$"
@@ -507,10 +508,12 @@ def _parse_response(*, response_spec: _ResponseSpec) -> _ParsedResponse:
 
 
 def _parse_mappings(
-    *, stubs: dict[str, Any], base_url: str
+    *, stubs: Mapping[str, object], base_url: str
 ) -> list[_ParsedMapping]:
     """Parse valid mappings into a representation shared by backends."""
-    raw: object = stubs.get("mappings") or []
+    raw = stubs.get("mappings")
+    if raw is None:
+        raw = list[object]()
     if not isinstance(raw, list):
         return []
     mappings = cast("list[object]", raw)
@@ -530,7 +533,9 @@ def _parse_mappings(
             case _:
                 continue
 
-        method_raw: object = request_spec.get("method") or "GET"
+        method_raw = request_spec.get("method")
+        if method_raw is None:
+            method_raw = "GET"
         if not isinstance(method_raw, str):
             continue
         method = method_raw.upper()
@@ -652,7 +657,7 @@ def _build_httpx2_handler(
 
 @beartype
 def create_httpx2_transport(
-    *, stubs: dict[str, Any], base_url: str
+    *, stubs: Mapping[str, object], base_url: str
 ) -> httpx2.MockTransport:
     """Create a native HTTPX2 transport loaded with WireMock stubs.
 
@@ -676,7 +681,7 @@ def create_httpx2_transport(
 def add_wiremock_to_respx(
     *,
     mock_obj: respx.MockRouter | respx.Router,
-    stubs: dict[str, Any],
+    stubs: Mapping[str, object],
     base_url: str,
 ) -> None:
     """
@@ -714,14 +719,14 @@ def add_wiremock_to_respx(
             method=mapping.method,
             url=mapping.url_pattern,
         )
-        route.mock(return_value=_build_response(parsed=mapping.response))
+        _ = route.mock(return_value=_build_response(parsed=mapping.response))
 
 
 @beartype
 def add_wiremock_to_responses(
     *,
     mock_obj: responses.RequestsMock,
-    stubs: dict[str, Any],
+    stubs: Mapping[str, object],
     base_url: str,
 ) -> None:
     """
@@ -748,7 +753,7 @@ def add_wiremock_to_responses(
             content_type=None,
             match=matchers,
         )
-        mock_obj.add(response)
+        _ = mock_obj.add(response)
 
 
 __all__ = [

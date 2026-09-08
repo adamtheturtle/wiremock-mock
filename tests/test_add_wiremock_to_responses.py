@@ -1,8 +1,7 @@
 """Tests for add_wiremock_to_responses."""
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from http import HTTPStatus
-from typing import Any
 
 import pytest
 import requests
@@ -15,7 +14,7 @@ BASE_URL = "http://notion-mock.test"
 
 def test_add_wiremock_to_responses_returns_configured_response() -> None:
     """Status, JSON, and single or repeated headers are returned."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/pages"},
@@ -26,7 +25,10 @@ def test_add_wiremock_to_responses_returns_configured_response() -> None:
                         "X-Single": "one",
                         "Set-Cookie": ["first=1", "second=2"],
                     },
-                    "jsonBody": {"object": "list", "results": []},
+                    "jsonBody": {
+                        "object": "list",
+                        "results": list[object](),
+                    },
                 },
             },
         ],
@@ -66,7 +68,7 @@ def test_add_wiremock_to_responses_response_bodies(
     response_spec: dict[str, object], expected: bytes
 ) -> None:
     """WireMock response body variants are supported."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/body"},
@@ -92,7 +94,7 @@ def test_add_wiremock_to_responses_response_bodies(
 )
 def test_add_wiremock_to_responses_matches_methods(method: str) -> None:
     """HTTP methods are registered with responses."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {"method": method, "urlPath": "/method"},
@@ -119,7 +121,7 @@ def test_add_wiremock_to_responses_matches_methods(method: str) -> None:
 
 def test_add_wiremock_to_responses_matches_path_and_query() -> None:
     """Path regexes and equalTo query parameters are supported."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -150,7 +152,7 @@ def test_add_wiremock_to_responses_matches_path_and_query() -> None:
 
 def test_add_wiremock_to_responses_distinguishes_json_bodies() -> None:
     """Two mappings at one URL can differ by their JSON bodies."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -213,7 +215,7 @@ def test_add_wiremock_to_responses_matches_raw_bodies(
     body_patterns: list[dict[str, object]], body: str | bytes | None
 ) -> None:
     """String and byte request bodies can use raw body matchers."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -249,7 +251,7 @@ def test_add_wiremock_to_responses_rejects_unmatchable_bodies(
     body: bytes | Iterator[bytes],
 ) -> None:
     """Non-text and streamed bodies do not satisfy text matchers."""
-    stubs: dict[str, Any] = {
+    stubs: Mapping[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -270,7 +272,7 @@ def test_add_wiremock_to_responses_rejects_unmatchable_bodies(
             base_url=BASE_URL,
         )
         with pytest.raises(expected_exception=requests.ConnectionError):
-            requests.post(
+            _ = requests.post(
                 url=f"{BASE_URL}/raw",
                 data=body,
                 timeout=1,

@@ -22,21 +22,24 @@ requests with responses
 
    """Use WireMock stubs with requests and responses."""
 
+   from collections.abc import Mapping
    from http import HTTPStatus
-   from typing import Any
 
    import requests
    import responses
 
    from wiremock_mock import add_wiremock_to_responses
 
-   stubs: dict[str, Any] = {
+   stubs: Mapping[str, object] = {
        "mappings": [
            {
                "request": {"method": "GET", "urlPath": "/v1/pages"},
                "response": {
                    "status": 200,
-                   "jsonBody": {"object": "list", "results": []},
+                   "jsonBody": {
+                       "object": "list",
+                       "results": list[object](),
+                   },
                },
            },
        ],
@@ -58,21 +61,24 @@ httpx with respx
 
    """Use WireMock stubs with httpx and respx."""
 
+   from collections.abc import Mapping
    from http import HTTPStatus
-   from typing import Any
 
    import httpx
    import respx
 
    from wiremock_mock import add_wiremock_to_respx
 
-   stubs: dict[str, Any] = {
+   stubs: Mapping[str, object] = {
        "mappings": [
            {
                "request": {"method": "GET", "urlPath": "/v1/pages"},
                "response": {
                    "status": 200,
-                   "jsonBody": {"object": "list", "results": []},
+                   "jsonBody": {
+                       "object": "list",
+                       "results": list[object](),
+                   },
                },
            },
        ],
@@ -93,20 +99,23 @@ HTTPX2 with a native mock transport
 
    """Use WireMock stubs with HTTPX2."""
 
+   from collections.abc import Mapping
    from http import HTTPStatus
-   from typing import Any
 
    import httpx2
 
    from wiremock_mock import create_httpx2_transport
 
-   stubs: dict[str, Any] = {
+   stubs: Mapping[str, object] = {
        "mappings": [
            {
                "request": {"method": "GET", "urlPath": "/v1/pages"},
                "response": {
                    "status": 200,
-                   "jsonBody": {"object": "list", "results": []},
+                   "jsonBody": {
+                       "object": "list",
+                       "results": list[object](),
+                   },
                },
            },
        ],
