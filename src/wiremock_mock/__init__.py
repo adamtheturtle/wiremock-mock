@@ -11,7 +11,7 @@ from typing import (
     NamedTuple,
     Protocol,
     TypedDict,
-    cast,  # noqa: TID251
+    TypeGuard,
     override,
 )
 
@@ -21,12 +21,6 @@ import responses
 import respx
 from beartype import beartype
 from respx.patterns import Match, Pattern
-
-
-class _QueryParamMatcher(TypedDict, total=False):
-    """A WireMock query parameter matcher."""
-
-    equalTo: object
 
 
 class _RequestSpec(TypedDict, total=False):
@@ -81,6 +75,37 @@ class _ParsedMapping(NamedTuple):
     response: _ParsedResponse
 
 
+def _is_object_list(value: object, /) -> TypeGuard[list[object]]:
+    """Return whether a value is a list with arbitrary contents."""
+    return isinstance(value, list)
+
+
+def _is_object_dict(value: object, /) -> TypeGuard[dict[object, object]]:
+    """Return whether a value is a dictionary with arbitrary contents."""
+    return isinstance(value, dict)
+
+
+def _is_string_object_dict(value: object, /) -> TypeGuard[dict[str, object]]:
+    """Return whether a value is a dictionary with string keys."""
+    if not _is_object_dict(value):
+        return False
+    return all(isinstance(key, str) for key in value)
+
+
+def _is_request_spec(value: object, /) -> TypeGuard[_RequestSpec]:
+    """Return whether a value has the shape accepted for a request
+    spec.
+    """
+    return _is_string_object_dict(value)
+
+
+def _is_response_spec(value: object, /) -> TypeGuard[_ResponseSpec]:
+    """Return whether a value has the shape accepted for a response
+    spec.
+    """
+    return _is_string_object_dict(value)
+
+
 def _coerce_json(*, value: object) -> object:
     """
     Coerce a WireMock ``equalToJson`` value to a comparable JSON value.
@@ -107,23 +132,21 @@ def _json_values_match(
     """Return whether ``actual`` matches ``expected`` JSON, per the
     flags.
     """
-    match expected:
-        case dict():
-            return _json_objects_match(
-                expected=cast("dict[object, object]", expected),
-                actual=actual,
-                ignore_array_order=ignore_array_order,
-                ignore_extra_elements=ignore_extra_elements,
-            )
-        case list():
-            return isinstance(actual, list) and _json_arrays_match(
-                expected=cast("list[object]", expected),
-                actual=cast("list[object]", actual),
-                ignore_array_order=ignore_array_order,
-                ignore_extra_elements=ignore_extra_elements,
-            )
-        case _:
-            return expected == actual
+    if _is_object_dict(expected):
+        return _json_objects_match(
+            expected=expected,
+            actual=actual,
+            ignore_array_order=ignore_array_order,
+            ignore_extra_elements=ignore_extra_elements,
+        )
+    if _is_object_list(expected):
+        return _is_object_list(actual) and _json_arrays_match(
+            expected=expected,
+            actual=actual,
+            ignore_array_order=ignore_array_order,
+            ignore_extra_elements=ignore_extra_elements,
+        )
+    return expected == actual
 
 
 def _json_objects_match(
@@ -134,17 +157,16 @@ def _json_objects_match(
     ignore_extra_elements: bool,
 ) -> bool:
     """Return whether ``actual`` matches the ``expected`` JSON object."""
-    if not isinstance(actual, dict):
+    if not _is_object_dict(actual):
         return False
-    actual_obj = cast("dict[object, object]", actual)
-    if not ignore_extra_elements and expected.keys() != actual_obj.keys():
+    if not ignore_extra_elements and expected.keys() != actual.keys():
         return False
     for key, expected_value in expected.items():
-        if key not in actual_obj:
+        if key not in actual:
             return False
         if not _json_values_match(
             expected=expected_value,
-            actual=actual_obj[key],
+            actual=actual[key],
             ignore_array_order=ignore_array_order,
             ignore_extra_elements=ignore_extra_elements,
         ):
@@ -337,15 +359,13 @@ def _build_body_matcher(*, matcher: dict[str, object]) -> _BodyMatcher | None:
 
 def _build_body_matchers(*, body_patterns: object) -> list[_BodyMatcher]:
     """Build matchers from a WireMock ``bodyPatterns`` list."""
-    if not isinstance(body_patterns, list):
+    if not _is_object_list(body_patterns):
         return []
     patterns: list[_BodyMatcher] = []
-    for matcher in cast("list[object]", body_patterns):
-        if not isinstance(matcher, dict):
+    for matcher in body_patterns:
+        if not _is_string_object_dict(matcher):
             continue
-        pattern = _build_body_matcher(
-            matcher=cast("dict[str, object]", matcher)
-        )
+        pattern = _build_body_matcher(matcher=matcher)
         if pattern is not None:
             patterns.append(pattern)
     return patterns
@@ -372,10 +392,9 @@ def _build_path_pattern(
     if query_params is not None and len(query_params) > 0:
         lookaheads: list[str] = []
         for param_name, param_matcher in query_params.items():
-            if not isinstance(param_matcher, dict):
+            if not _is_string_object_dict(param_matcher):
                 continue
-            eq_matcher = cast("_QueryParamMatcher", param_matcher)
-            match eq_matcher:
+            match param_matcher:
                 case {"equalTo": eq_val} if eq_val is not None:
                     value = re.escape(pattern=str(object=eq_val))
                     lookaheads.append(
@@ -393,22 +412,19 @@ def _build_path_pattern(
 def _build_response_headers(*, headers_raw: object) -> list[tuple[str, str]]:
     """Build HTTPX headers from a WireMock response header mapping."""
     headers: list[tuple[str, str]] = []
-    if not isinstance(headers_raw, dict):
+    if not _is_object_dict(headers_raw):
         return headers
-    for name, value in cast("dict[object, object]", headers_raw).items():
+    for name, value in headers_raw.items():
         if not isinstance(name, str):
             continue
-        match value:
-            case str() as header_value:
-                headers.append((name, header_value))
-            case list():
-                headers.extend(
-                    (name, header_value)
-                    for header_value in cast("list[object]", value)
-                    if isinstance(header_value, str)
-                )
-            case _:
-                pass
+        if isinstance(value, str):
+            headers.append((name, value))
+        elif _is_object_list(value):
+            headers.extend(
+                (name, header_value)
+                for header_value in value
+                if isinstance(header_value, str)
+            )
     return headers
 
 
@@ -514,24 +530,21 @@ def _parse_mappings(
     raw = stubs.get("mappings")
     if raw is None:
         raw = list[object]()
-    if not isinstance(raw, list):
+    if not _is_object_list(raw):
         return []
-    mappings = cast("list[object]", raw)
     parsed_mappings: list[_ParsedMapping] = []
 
-    for item in mappings:
-        if not isinstance(item, dict):
+    for item in raw:
+        if not _is_string_object_dict(item):
             continue
-        mapping = cast("dict[str, object]", item)
-        match mapping:
-            case {
-                "request": dict(),
-                "response": dict(),
-            }:
-                request_spec = cast("_RequestSpec", mapping["request"])
-                response_spec = cast("_ResponseSpec", mapping["response"])
-            case _:
-                continue
+        request_value = item.get("request")
+        response_value = item.get("response")
+        if not _is_request_spec(request_value) or not _is_response_spec(
+            response_value
+        ):
+            continue
+        request_spec = request_value
+        response_spec = response_value
 
         method_raw = request_spec.get("method")
         if method_raw is None:
@@ -543,12 +556,11 @@ def _parse_mappings(
         url_path = request_spec.get("urlPath")
         url_path_pattern = request_spec.get("urlPathPattern")
         query_params_raw = request_spec.get("queryParameters")
-        query_params: dict[str, object] | None
-        match query_params_raw:
-            case dict():
-                query_params = cast("dict[str, object]", query_params_raw)
-            case _:
-                query_params = None
+        query_params = (
+            query_params_raw
+            if _is_string_object_dict(query_params_raw)
+            else None
+        )
 
         if url_path is None and url_path_pattern is None:
             continue

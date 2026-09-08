@@ -310,8 +310,7 @@ exclude = [ ".venv" ]
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
-    # Internal TypedDict classes used via cast() string literals
-    "_QueryParamMatcher",
+    # Internal TypedDict classes used only for runtime-narrowing annotations
     "_RequestSpec",
     "_ResponseSpec",
     "add_wiremock_to_responses",
