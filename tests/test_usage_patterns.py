@@ -1,7 +1,7 @@
 """Tests for supported usage patterns."""
 
+from collections.abc import Mapping
 from http import HTTPStatus
-from typing import Any
 
 import httpx
 import requests
@@ -11,7 +11,7 @@ import respx
 from wiremock_mock import add_wiremock_to_responses, add_wiremock_to_respx
 
 _BASE_URL = "http://wiremock.test"
-_STUBS: dict[str, Any] = {
+_STUBS: Mapping[str, object] = {
     "mappings": [
         {
             "request": {"method": "GET", "urlPath": "/greeting"},
