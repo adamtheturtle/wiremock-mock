@@ -1,6 +1,5 @@
 """Tests for add_wiremock_to_respx."""
 
-from collections.abc import Mapping  # noqa: TC003
 from http import HTTPStatus
 
 import httpx
@@ -16,7 +15,7 @@ _PAGE_ID = "59833787-2cf9-4fdf-8782-e53db20768a5"
 
 def test_add_wiremock_to_respx_simple_get() -> None:
     """Add_wiremock_to_respx adds a simple GET stub."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/pages"},
@@ -40,7 +39,7 @@ def test_add_wiremock_to_respx_simple_get() -> None:
 
 def test_add_wiremock_to_respx_post() -> None:
     """Add_wiremock_to_respx adds a POST stub."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "POST", "urlPath": "/v1/pages"},
@@ -60,7 +59,7 @@ def test_add_wiremock_to_respx_post() -> None:
 
 def test_add_wiremock_to_respx_patch() -> None:
     """Add_wiremock_to_respx adds a PATCH stub."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -85,7 +84,7 @@ def test_add_wiremock_to_respx_patch() -> None:
 
 def test_add_wiremock_to_respx_delete() -> None:
     """Add_wiremock_to_respx adds a DELETE stub."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -105,7 +104,7 @@ def test_add_wiremock_to_respx_delete() -> None:
 def test_add_wiremock_to_respx_with_query_parameters() -> None:
     """Add_wiremock_to_respx matches query parameters with equalTo."""
     _block_id = "cccc0000-0000-0000-0000-000000000010"
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -136,7 +135,7 @@ def test_add_wiremock_to_respx_with_query_parameters() -> None:
 
 def test_add_wiremock_to_respx_url_path_pattern() -> None:
     """Add_wiremock_to_respx supports urlPathPattern regex."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -158,21 +157,21 @@ def test_add_wiremock_to_respx_url_path_pattern() -> None:
 
 def test_add_wiremock_to_respx_empty_mappings() -> None:
     """Add_wiremock_to_respx handles empty mappings without error."""
-    stubs: Mapping[str, object] = {"mappings": []}
+    stubs: dict[str, object] = {"mappings": []}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
 
 def test_add_wiremock_to_respx_mappings_not_list() -> None:
     """Add_wiremock_to_respx returns early when mappings is not a list."""
-    stubs: Mapping[str, object] = {"mappings": "not-a-list"}
+    stubs: dict[str, object] = {"mappings": "not-a-list"}
     with respx.mock(base_url=BASE_URL, assert_all_called=False) as m:
         add_wiremock_to_respx(mock_obj=m, stubs=stubs, base_url=BASE_URL)
 
 
 def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
     """Add_wiremock_to_respx supports urlPathPattern without urlPath."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -191,7 +190,7 @@ def test_add_wiremock_to_respx_url_path_pattern_only() -> None:
 
 def test_add_wiremock_to_respx_body_response() -> None:
     """Add_wiremock_to_respx supports body (non-JSON) response."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/raw"},
@@ -208,7 +207,7 @@ def test_add_wiremock_to_respx_body_response() -> None:
 
 def test_add_wiremock_to_respx_body_bytes_response() -> None:
     """Add_wiremock_to_respx supports bytes body response."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/bin"},
@@ -225,7 +224,7 @@ def test_add_wiremock_to_respx_body_bytes_response() -> None:
 
 def test_add_wiremock_to_respx_base64_body_response() -> None:
     """Add_wiremock_to_respx decodes a WireMock ``base64Body``."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/bin"},
@@ -244,7 +243,7 @@ def test_add_wiremock_to_respx_base64_body_response() -> None:
 
 def test_add_wiremock_to_respx_response_metadata() -> None:
     """Status messages and single or repeated headers are returned."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/created"},
@@ -278,7 +277,7 @@ def test_add_wiremock_to_respx_response_metadata() -> None:
 
 def test_add_wiremock_to_respx_body_non_string_response() -> None:
     """Add_wiremock_to_respx converts non-str/bytes body via str()."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/num"},
@@ -295,7 +294,7 @@ def test_add_wiremock_to_respx_body_non_string_response() -> None:
 
 def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
     """Add_wiremock_to_respx adds leading slash when urlPath lacks it."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "v1/pages"},
@@ -314,7 +313,7 @@ def test_add_wiremock_to_respx_path_without_leading_slash() -> None:
 
 def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
     """Add_wiremock_to_respx skips mappings with invalid structure."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             "not-a-dict",
             {"request": "invalid", "response": {"status": 200}},
@@ -342,7 +341,7 @@ def test_add_wiremock_to_respx_skips_invalid_mapping() -> None:
 
 def test_add_wiremock_to_respx_query_param_without_equal_to() -> None:
     """Add_wiremock_to_respx ignores query params without equalTo."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -367,7 +366,7 @@ def test_add_wiremock_to_respx_query_param_non_dict_matcher() -> None:
     """Add_wiremock_to_respx skips query params with non-dict matcher
     values.
     """
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -392,7 +391,7 @@ def test_add_wiremock_to_respx_url_path_with_extra_query_params() -> None:
     """UrlPath without queryParameters matches requests with query
     params.
     """
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -416,7 +415,7 @@ def test_add_wiremock_to_respx_url_path_with_extra_query_params() -> None:
 def test_add_wiremock_to_respx_body_equal_to_json() -> None:
     """Two stubs at the same URL differ by ``equalToJson`` body."""
     url = f"{BASE_URL}/v1/blocks/{_PAGE_ID}/children"
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -466,7 +465,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_no_match() -> None:
     """A request whose body matches no ``equalToJson`` stub is
     unhandled.
     """
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -486,7 +485,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_no_match() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to_json_from_string() -> None:
     """``equalToJson`` may be given as a JSON string."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -506,7 +505,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_from_string() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to_json_invalid_string() -> None:
     """A non-JSON ``equalToJson`` string is compared as raw text."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -526,7 +525,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_invalid_string() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to_json_not_json_body() -> None:
     """A non-JSON request body does not match ``equalToJson``."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -546,7 +545,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_not_json_body() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to_json_non_utf8() -> None:
     """A non-UTF-8 request body does not match ``equalToJson``."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -566,7 +565,7 @@ def test_add_wiremock_to_respx_body_equal_to_json_non_utf8() -> None:
 
 def test_add_wiremock_to_respx_body_ignore_extra_elements() -> None:
     """``ignoreExtraElements`` matches a subset of object keys."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -594,7 +593,7 @@ def test_add_wiremock_to_respx_body_ignore_extra_elements() -> None:
 
 def test_add_wiremock_to_respx_body_extra_elements_not_ignored() -> None:
     """Without ``ignoreExtraElements``, extra object keys do not match."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -614,7 +613,7 @@ def test_add_wiremock_to_respx_body_extra_elements_not_ignored() -> None:
 
 def test_add_wiremock_to_respx_body_ignore_array_order() -> None:
     """``ignoreArrayOrder`` matches arrays regardless of element order."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -642,7 +641,7 @@ def test_add_wiremock_to_respx_body_ignore_array_order() -> None:
 
 def test_add_wiremock_to_respx_body_array_order_enforced() -> None:
     """Without ``ignoreArrayOrder``, array element order must match."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -664,7 +663,7 @@ def test_add_wiremock_to_respx_body_array_order_enforced() -> None:
 
 def test_add_wiremock_to_respx_body_array_length_mismatch() -> None:
     """An array of a different length does not match without flags."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -686,7 +685,7 @@ def test_add_wiremock_to_respx_body_array_length_mismatch() -> None:
 
 def test_add_wiremock_to_respx_body_array_ignore_extra_ordered() -> None:
     """``ignoreExtraElements`` matches an in-order subsequence of an array."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -714,7 +713,7 @@ def test_add_wiremock_to_respx_body_array_ignore_extra_ordered() -> None:
 
 def test_add_wiremock_to_respx_body_array_ignore_extra_missing() -> None:
     """An ordered subsequence match fails when an element is missing."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -743,7 +742,7 @@ def test_add_wiremock_to_respx_body_array_unordered_missing() -> None:
     """An unordered array match fails when an expected element is
     absent.
     """
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -770,7 +769,7 @@ def test_add_wiremock_to_respx_body_array_unordered_missing() -> None:
 
 def test_add_wiremock_to_respx_body_object_vs_array() -> None:
     """An object expectation does not match an array body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -790,7 +789,7 @@ def test_add_wiremock_to_respx_body_object_vs_array() -> None:
 
 def test_add_wiremock_to_respx_body_array_vs_object() -> None:
     """An array expectation does not match an object body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -810,7 +809,7 @@ def test_add_wiremock_to_respx_body_array_vs_object() -> None:
 
 def test_add_wiremock_to_respx_body_missing_key() -> None:
     """An expected object key absent from the body does not match."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -835,7 +834,7 @@ def test_add_wiremock_to_respx_body_missing_key() -> None:
 
 def test_add_wiremock_to_respx_body_contains() -> None:
     """``contains`` matches a substring of the raw request body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -858,7 +857,7 @@ def test_add_wiremock_to_respx_body_contains() -> None:
 
 def test_add_wiremock_to_respx_body_contains_non_utf8() -> None:
     """``contains`` does not match a non-UTF-8 request body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -878,7 +877,7 @@ def test_add_wiremock_to_respx_body_contains_non_utf8() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to() -> None:
     """``equalTo`` matches the raw request body exactly."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -901,7 +900,7 @@ def test_add_wiremock_to_respx_body_equal_to() -> None:
 
 def test_add_wiremock_to_respx_body_equal_to_no_match() -> None:
     """``equalTo`` does not match a different raw request body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -921,7 +920,7 @@ def test_add_wiremock_to_respx_body_equal_to_no_match() -> None:
 
 def test_add_wiremock_to_respx_body_multiple_patterns() -> None:
     """All ``bodyPatterns`` on a stub must match together."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -949,7 +948,7 @@ def test_add_wiremock_to_respx_body_multiple_patterns() -> None:
 
 def test_add_wiremock_to_respx_body_patterns_not_list() -> None:
     """A non-list ``bodyPatterns`` is ignored."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -969,7 +968,7 @@ def test_add_wiremock_to_respx_body_patterns_not_list() -> None:
 
 def test_add_wiremock_to_respx_body_pattern_non_dict() -> None:
     """A non-dict body matcher entry is skipped."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -989,7 +988,7 @@ def test_add_wiremock_to_respx_body_pattern_non_dict() -> None:
 
 def test_add_wiremock_to_respx_body_pattern_unsupported() -> None:
     """An unsupported body matcher is ignored, matching any body."""
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {
@@ -1011,7 +1010,7 @@ def test_add_wiremock_to_respx_invalid_status_and_headers() -> None:
     """Add_wiremock_to_respx uses defaults for invalid status and
     headers.
     """
-    stubs: Mapping[str, object] = {
+    stubs: dict[str, object] = {
         "mappings": [
             {
                 "request": {"method": "GET", "urlPath": "/v1/edge"},
