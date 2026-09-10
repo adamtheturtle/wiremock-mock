@@ -428,9 +428,11 @@ def _build_response_headers(*, headers_raw: object) -> list[tuple[str, str]]:
     return headers
 
 
-def _build_response_extensions(*, status_message: object) -> dict[str, object]:
+def _build_response_extensions(
+    *, status_message: str | None
+) -> dict[str, bytes]:
     """Build HTTPX extensions for WireMock response metadata."""
-    if isinstance(status_message, str):
+    if status_message is not None:
         return {"reason_phrase": status_message.encode()}
     return {}
 
