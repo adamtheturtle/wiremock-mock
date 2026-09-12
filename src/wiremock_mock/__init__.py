@@ -75,16 +75,19 @@ class _ParsedMapping(NamedTuple):
     response: _ParsedResponse
 
 
+@beartype
 def _is_object_list(value: object, /) -> TypeGuard[list[object]]:
     """Return whether a value is a list with arbitrary contents."""
     return isinstance(value, list)
 
 
+@beartype
 def _is_object_dict(value: object, /) -> TypeGuard[dict[object, object]]:
     """Return whether a value is a dictionary with arbitrary contents."""
     return isinstance(value, dict)
 
 
+@beartype
 def _is_string_object_dict(value: object, /) -> TypeGuard[dict[str, object]]:
     """Return whether a value is a dictionary with string keys."""
     if not _is_object_dict(value):
@@ -92,6 +95,7 @@ def _is_string_object_dict(value: object, /) -> TypeGuard[dict[str, object]]:
     return all(isinstance(key, str) for key in value)
 
 
+@beartype
 def _is_request_spec(value: object, /) -> TypeGuard[_RequestSpec]:
     """Return whether a value has the shape accepted for a request
     spec.
@@ -99,6 +103,7 @@ def _is_request_spec(value: object, /) -> TypeGuard[_RequestSpec]:
     return _is_string_object_dict(value)
 
 
+@beartype
 def _is_response_spec(value: object, /) -> TypeGuard[_ResponseSpec]:
     """Return whether a value has the shape accepted for a response
     spec.
@@ -106,6 +111,7 @@ def _is_response_spec(value: object, /) -> TypeGuard[_ResponseSpec]:
     return _is_string_object_dict(value)
 
 
+@beartype
 def _coerce_json(*, value: object) -> object:
     """
     Coerce a WireMock ``equalToJson`` value to a comparable JSON value.
@@ -122,6 +128,7 @@ def _coerce_json(*, value: object) -> object:
     return value
 
 
+@beartype
 def _json_values_match(
     *,
     expected: object,
@@ -149,6 +156,7 @@ def _json_values_match(
     return expected == actual
 
 
+@beartype
 def _json_objects_match(
     *,
     expected: dict[object, object],
@@ -174,6 +182,7 @@ def _json_objects_match(
     return True
 
 
+@beartype
 def _json_arrays_match(
     *,
     expected: list[object],
@@ -195,6 +204,7 @@ def _json_arrays_match(
     )
 
 
+@beartype
 def _json_arrays_match_unordered(
     *,
     expected: list[object],
@@ -218,6 +228,7 @@ def _json_arrays_match_unordered(
     return ignore_extra_elements or all(used)
 
 
+@beartype
 def _json_arrays_match_ordered(
     *,
     expected: list[object],
@@ -242,6 +253,7 @@ def _json_arrays_match_ordered(
     return True
 
 
+@beartype
 def _request_text(*, content: bytes | None) -> str | None:
     """Return request content as text, or ``None`` if it is not text."""
     if content is None:
@@ -252,6 +264,7 @@ def _request_text(*, content: bytes | None) -> str | None:
         return None
 
 
+@beartype
 def _equal_to_predicate(
     *,
     expected: str,
@@ -265,6 +278,7 @@ def _equal_to_predicate(
     return predicate
 
 
+@beartype
 def _contains_predicate(
     *,
     substring: str,
@@ -279,6 +293,7 @@ def _contains_predicate(
     return predicate
 
 
+@beartype
 def _equal_to_json_predicate(
     *,
     expected: object,
@@ -308,6 +323,7 @@ def _equal_to_json_predicate(
     return predicate
 
 
+@beartype
 class _BodyPattern(Pattern):
     """A WireMock request-body matcher expressed as a respx pattern."""
 
@@ -334,6 +350,7 @@ class _BodyPattern(Pattern):
         return Match(matches=self._predicate(request.read()))
 
 
+@beartype
 def _build_body_matcher(*, matcher: dict[str, object]) -> _BodyMatcher | None:
     """Build a backend-neutral WireMock request-body matcher."""
     identity = json.dumps(obj=matcher, sort_keys=True, default=str)
@@ -357,6 +374,7 @@ def _build_body_matcher(*, matcher: dict[str, object]) -> _BodyMatcher | None:
     return _BodyMatcher(identity=identity, predicate=predicate)
 
 
+@beartype
 def _build_body_matchers(*, body_patterns: object) -> list[_BodyMatcher]:
     """Build matchers from a WireMock ``bodyPatterns`` list."""
     if not _is_object_list(body_patterns):
@@ -371,6 +389,7 @@ def _build_body_matchers(*, body_patterns: object) -> list[_BodyMatcher]:
     return patterns
 
 
+@beartype
 def _build_path_pattern(
     *,
     base_url: str,
@@ -409,6 +428,7 @@ def _build_path_pattern(
     return re.compile(pattern=full_pattern)
 
 
+@beartype
 def _build_response_headers(*, headers_raw: object) -> list[tuple[str, str]]:
     """Build HTTPX headers from a WireMock response header mapping."""
     headers: list[tuple[str, str]] = []
@@ -428,6 +448,7 @@ def _build_response_headers(*, headers_raw: object) -> list[tuple[str, str]]:
     return headers
 
 
+@beartype
 def _build_response_extensions(
     *, status_message: str | None
 ) -> dict[str, bytes]:
@@ -437,6 +458,7 @@ def _build_response_extensions(
     return {}
 
 
+@beartype
 def _build_response(*, parsed: _ParsedResponse) -> httpx.Response:
     """Build an httpx response from a parsed WireMock response."""
     extensions = _build_response_extensions(
@@ -450,6 +472,7 @@ def _build_response(*, parsed: _ParsedResponse) -> httpx.Response:
     )
 
 
+@beartype
 def _build_httpx2_response(
     *, parsed: _ParsedResponse, request: httpx2.Request
 ) -> httpx2.Response:
@@ -466,6 +489,7 @@ def _build_httpx2_response(
     )
 
 
+@beartype
 def _parse_response(*, response_spec: _ResponseSpec) -> _ParsedResponse:
     """Parse a backend-neutral response from a WireMock response dict."""
     match response_spec.get("status"):
@@ -525,6 +549,7 @@ def _parse_response(*, response_spec: _ResponseSpec) -> _ParsedResponse:
     )
 
 
+@beartype
 def _parse_mappings(
     *, stubs: Mapping[str, object], base_url: str
 ) -> list[_ParsedMapping]:
@@ -591,6 +616,7 @@ def _parse_mappings(
     return parsed_mappings
 
 
+@beartype
 def _responses_request_content(*, body: object) -> bytes | None:
     """Convert a requests body into content accepted by our matchers."""
     match body:
@@ -604,6 +630,7 @@ def _responses_request_content(*, body: object) -> bytes | None:
             return None
 
 
+@beartype
 def _build_responses_matcher(
     *, body_matcher: _BodyMatcher
 ) -> Callable[[_RequestWithBody], tuple[bool, str]]:
@@ -622,6 +649,7 @@ def _build_responses_matcher(
     return matcher
 
 
+@beartype
 def _build_responses_callback(
     *, parsed: _ParsedResponse
 ) -> Callable[[object], tuple[int, list[tuple[str, str]], bytes]]:
@@ -636,6 +664,7 @@ def _build_responses_callback(
     return callback
 
 
+@beartype
 def _httpx2_request_matches(
     *, request: httpx2.Request, mapping: _ParsedMapping
 ) -> bool:
@@ -651,6 +680,7 @@ def _httpx2_request_matches(
     )
 
 
+@beartype
 def _build_httpx2_handler(
     *, mappings: list[_ParsedMapping]
 ) -> Callable[[httpx2.Request], httpx2.Response]:
