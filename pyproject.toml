@@ -381,6 +381,7 @@ exclude_gitignore = true
 follow_untyped_imports = true
 strict = true
 plugins = [ "mypy_strict_kwargs" ]
+num_workers = "auto"
 
 [tool.pyrefly]
 errors.non-exhaustive-match = "error"
