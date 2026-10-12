@@ -61,7 +61,7 @@ dev = [
     "no-defaults==2026.9.1",
     "prek==0.5.5",
     "pydocstringformatter==1.0.0",
-    "pylint[spelling]==4.0.9",
+    "pylint[spelling]==4.1.2",
     "pylint-per-file-ignores==4.0.0",
     "pyproject-fmt==2.30.1",
     "pyrefly==1.3.2",
@@ -317,6 +317,8 @@ exclude = [ ".venv" ]
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
+    # respx invokes lookup methods dynamically from ``Pattern._match``.
+    "_eq",
     # Internal TypedDict classes used only for runtime-narrowing annotations
     "_RequestSpec",
     "_ResponseSpec",
@@ -349,8 +351,6 @@ ignore_names = [
     "linkcheck_ignore",
     "linkcheck_retries",
     "master_doc",
-    # respx ``Pattern.match`` is invoked dynamically by respx
-    "match",
     "nitpicky",
     "project_copyright",
     "pygments_style",
