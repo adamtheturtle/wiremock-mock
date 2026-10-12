@@ -20,7 +20,7 @@ import httpx2
 import responses
 import respx
 from beartype import beartype
-from respx.patterns import Match, Pattern
+from respx.patterns import Content, Match
 
 
 class _RequestSpec(TypedDict, total=False):
@@ -324,7 +324,7 @@ def _equal_to_json_predicate(
 
 
 @beartype
-class _BodyPattern(Pattern):
+class _BodyPattern(Content):
     """A WireMock request-body matcher expressed as a respx pattern."""
 
     key = "wiremock_body"
@@ -345,9 +345,9 @@ class _BodyPattern(Pattern):
         self._predicate = predicate
 
     @override
-    def match(self, request: httpx.Request) -> Match:
-        """Return whether ``request`` matches this body pattern."""
-        return Match(matches=self._predicate(request.read()))
+    def _eq(self, value: bytes) -> Match:
+        """Return whether the request body matches this body pattern."""
+        return Match(matches=self._predicate(value))
 
 
 @beartype
