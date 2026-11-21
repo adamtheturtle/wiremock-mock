@@ -51,7 +51,7 @@ requests with responses
        response = requests.get(url="http://notion-mock.test/v1/pages", timeout=1)
        assert response.status_code == HTTPStatus.OK
 
-The standard responses decorator workflow is also supported by passing ``responses.mock`` while ``@responses.activate`` is active.
+To use the decorator from ``responses``, pass ``responses.mock`` while ``@responses.activate`` is active.
 
 httpx with respx
 ~~~~~~~~~~~~~~~~
