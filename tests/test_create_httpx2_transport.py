@@ -2,13 +2,23 @@
 
 import asyncio
 import base64
-from collections.abc import Mapping
+from collections.abc import Awaitable, Coroutine, Mapping
 from http import HTTPStatus
+from typing import Protocol
 
 import httpx2
 import pytest
 
 from wiremock_mock import create_httpx2_transport
+
+
+class _AsyncGetClient(Protocol):
+    """The async client interface used by the transport test."""
+
+    def get(self, *, url: str) -> Awaitable[httpx2.Response]:
+        """Request a URL."""
+        ...
+
 
 BASE_URL = "http://wiremock.test"
 
@@ -54,9 +64,11 @@ def test_async_client_uses_transport() -> None:
         async with httpx2.AsyncClient(
             transport=_transport(stubs=stubs)
         ) as client:
-            return await client.get(url=f"{BASE_URL}/greeting")
+            get_client: _AsyncGetClient = client
+            return await get_client.get(url=f"{BASE_URL}/greeting")
 
-    response = asyncio.run(main=request())
+    pending: Coroutine[object, object, httpx2.Response] = request()
+    response = asyncio.run(main=pending)
 
     assert isinstance(response, httpx2.Response)
     assert response.text == "Hello, async!"

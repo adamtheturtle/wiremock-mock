@@ -310,7 +310,7 @@ def _equal_to_json_predicate(
         if text is None:
             return False
         try:
-            actual = json.loads(s=text)
+            actual: object = json.loads(s=text)
         except json.JSONDecodeError:
             return False
         return _json_values_match(
