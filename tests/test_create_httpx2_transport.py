@@ -12,11 +12,15 @@ import pytest
 from wiremock_mock import create_httpx2_transport
 
 
-class _AsyncGetClient(Protocol):
-    """The async client interface used by the transport test."""
+class _AsyncRequestClient(Protocol):
+    """The asynchronous client interface used by the transport test."""
 
-    def get(self, *, url: str) -> Awaitable[httpx2.Response]:
-        """Request a URL."""
+    def build_request(self, *, method: str, url: str) -> httpx2.Request:
+        """Build a request using the client configuration."""
+        ...
+
+    def send(self, *, request: httpx2.Request) -> Awaitable[httpx2.Response]:
+        """Send the request through the client transport."""
         ...
 
 
@@ -64,8 +68,11 @@ def test_async_client_uses_transport() -> None:
         async with httpx2.AsyncClient(
             transport=_transport(stubs=stubs)
         ) as client:
-            get_client: _AsyncGetClient = client
-            return await get_client.get(url=f"{BASE_URL}/greeting")
+            request_client: _AsyncRequestClient = client
+            request = request_client.build_request(
+                method="GET", url=f"{BASE_URL}/greeting"
+            )
+            return await request_client.send(request=request)
 
     pending: Coroutine[object, object, httpx2.Response] = request()
     response = asyncio.run(main=pending)
